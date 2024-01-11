@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import RootLayout from "@/containers/Layout/Forms"
 import Link from "next/link"
 import Auth from "@/components/Auth"
+import { from, useMediaQuery } from "@/styles/media"
 
 const FormSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email'),
@@ -19,6 +20,8 @@ const FormSchema = z.object({
 })
 
 export function SignUpView(){
+  const isMobile = !useMediaQuery(from.tabletLandscape);
+  
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
     });
@@ -30,7 +33,7 @@ export function SignUpView(){
     return (
         <RootLayout>
           <Auth imageSrc='/images/business_and_work_planning.png'>
-            <div className="mx-auto bg-gray-200 p-8 rounded-3xl shadow-md w-2/5">
+            <div className={`mx-auto bg-gray-200 p-8 rounded-3xl shadow-md ${isMobile ? 'w-full' : 'w-2/5'}`}>
               <p className="text-center text-2xl">Crea tu cuenta</p>
               <div className="mx-auto bg-white p-8 rounded-3xl shadow-md w-full">
                 <Form {...form}>
