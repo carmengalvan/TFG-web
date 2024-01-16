@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button"
 import RootLayout from "@/containers/Layout/Forms"
 import Link from "next/link"
 import Auth from "@/components/Auth"
-import { from, useMediaQuery } from "@/styles/media"
+import { useConnect } from "./connect"
+import { onPromise } from "@/utils/onPromise"
 
 const FormSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email'),
@@ -17,20 +18,16 @@ const FormSchema = z.object({
 })
 
 export function SignInView(){
-    const isMobile = !useMediaQuery(from.tabletLandscape);
-    
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
     });
 
-    const onSubmit = (values: z.infer<typeof FormSchema>) => {
-        console.log(values)
-    }
+    const { onSubmit, isSubmitting } = useConnect()
 
     return (
         <RootLayout>
             <Auth imageSrc='/images/inicio_sesion.png'>
-                <div className={`mx-auto bg-gray-200 p-8 rounded-3xl shadow-md ${isMobile ? 'w-full' : 'w-2/5'}`}>
+                <div className="mx-auto bg-gray-200 p-8 rounded-3xl shadow-md w-full md:w-2/5">
                     <p className="text-center text-2xl">Inicia sesión</p>
                     <div className="mx-auto bg-white p-8 rounded-3xl shadow-md w-full">
                         <Form {...form}>
@@ -70,7 +67,7 @@ export function SignInView(){
                                 </div>
                                 <br></br>
                                 <div className="text-center">
-                                    <Button type="submit">INICIAR SESIÓN</Button>
+                                    <Button disabled={isSubmitting} type="submit">INICIAR SESIÓN</Button>
                                 </div>
                             </form>
                             <div className="mx-auto my-4 flex w-full items-center justify-evenly

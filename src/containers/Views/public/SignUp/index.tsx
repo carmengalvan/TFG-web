@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import RootLayout from "@/containers/Layout/Forms"
 import Link from "next/link"
 import Auth from "@/components/Auth"
-import { from, useMediaQuery } from "@/styles/media"
 import { useConnect } from "./connect"
 import { useRouter } from "next/router"
 
@@ -19,11 +18,10 @@ const FormSchema = z.object({
   first_name: z.string().min(1, 'First name is required'),
   last_name: z.string().min(1, 'Last name is required'),
   password: z.string().min(1, 'Password is required').min(8, 'Password must have more than 8 characters'),
-  public_name: z.string().min(1, 'Public name is required'),
+  public_name: z.string().min(1, 'Public name is required').regex(/^[a-zA-Z0-9_]+$/, 'Only alphanumeric characters and underscores are allowed'),
 })
 
 export function SignUpView(){
-  const isMobile = !useMediaQuery(from.tabletLandscape);
   
   const form = useForm<z.infer<typeof FormSchema>>({
       resolver: zodResolver(FormSchema),
@@ -37,7 +35,6 @@ export function SignUpView(){
   } = useConnect();
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-    console.log(values)
     try {
       const response = await handleRegister({
         email: values.email,
@@ -57,7 +54,7 @@ export function SignUpView(){
   return (
     <RootLayout>
       <Auth imageSrc='/images/business_and_work_planning.png'>
-        <div className={`mx-auto bg-gray-200 p-8 rounded-3xl shadow-md ${isMobile ? 'w-full' : 'w-2/5'}`}>
+        <div className="mx-auto bg-gray-200 p-8 rounded-3xl shadow-md w-full md:w-2/5">
           <p className="text-center text-2xl">Crea tu cuenta</p>
           <div className="mx-auto bg-white p-8 rounded-3xl shadow-md w-full">
             <Form {...form}>
