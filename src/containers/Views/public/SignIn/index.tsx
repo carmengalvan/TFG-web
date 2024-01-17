@@ -10,19 +10,16 @@ import RootLayout from "@/containers/Layout/Forms"
 import Link from "next/link"
 import Auth from "@/components/Auth"
 import { useConnect } from "./connect"
-import { onPromise } from "@/utils/onPromise"
-
-const FormSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email'),
-  password: z.string().min(1, 'Password is required').min(8, 'Password must have more than 8 characters'),
-})
 
 export function SignInView(){
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-    });
 
-    const { onSubmit, isSubmitting } = useConnect()
+    const { form, onSubmit } = useConnect()
+
+    const getFirstError = () => {
+        const errors = Object.values(form.formState.errors);
+        const firstError = errors.find((error) => error && error.message === 'Please, enter valid credentials');
+        return firstError ? firstError.message : null;
+    };
 
     return (
         <RootLayout>
@@ -31,7 +28,7 @@ export function SignInView(){
                     <p className="text-center text-2xl">Inicia sesión</p>
                     <div className="mx-auto bg-white p-8 rounded-3xl shadow-md w-full">
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+                            <form onSubmit={onSubmit} className="w-full">
                                 <FormField
                                 control={form.control}
                                 name="email"
@@ -67,7 +64,8 @@ export function SignInView(){
                                 </div>
                                 <br></br>
                                 <div className="text-center">
-                                    <Button disabled={isSubmitting} type="submit">INICIAR SESIÓN</Button>
+                                    <Button disabled={form.formState.isSubmitting} type="submit">INICIAR SESIÓN</Button>
+                                    {getFirstError() && (<p className="text-red-500">{getFirstError()}</p>)}
                                 </div>
                             </form>
                             <div className="mx-auto my-4 flex w-full items-center justify-evenly

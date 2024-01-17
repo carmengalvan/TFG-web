@@ -1,23 +1,11 @@
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-
 import { useAuthActions } from '@/graphql/auth/useAuthActions';
-import * as z from "zod"
 import { zodResolver } from '@hookform/resolvers/zod';
 import { paths } from '@/globals/paths';
-
-const FormSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email'),
-  password: z.string().min(1, 'Password is required').min(8, 'Password must have more than 8 characters'),
-})
-
-type FormValues = z.infer<typeof FormSchema>
-
-export const defaultValues: FormValues = {
-  email: '',
-  password: '',
-};
+import { FormSchema, defaultValues } from './constants';
+import { FormValues, isGraphqlMessageError } from './types';
 
 export const useConnect = () => {
   const { handleLogin } = useAuthActions();
@@ -38,20 +26,15 @@ export const useConnect = () => {
     [trackedEmail],
   );
   
-  const {
-    formState: { errors, isSubmitting },
-    handleSubmit,
-    register,
-    reset,
-  } = useForm<FormValues>({
+  const form = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: initialValues,
     resolver: zodResolver(FormSchema),
   });
 
   useEffect(() => {
-    reset(initialValues);
-  }, [initialValues, reset]);
+    form.reset(initialValues);
+  }, [initialValues, form.reset]);
 
   const onSubmit = async(values: FormValues) => {
     try{
@@ -62,13 +45,18 @@ export const useConnect = () => {
       if (!!response) await push(paths.public.home)
     }catch(error){
       console.error('Error en la solicitud al backend:', error)
+
+      if (isGraphqlMessageError(error)) {
+        form.setError('_error' as keyof FormValues, {
+          type: 'manual',
+          message: 'Please, enter valid credentials',
+        });
+      }
     }
   }
 
   return {
-    errors,
-    register,
-    onSubmit,
-    isSubmitting,
+    form,
+    onSubmit: form.handleSubmit(onSubmit),
   };
 };
