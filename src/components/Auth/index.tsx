@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import Image from 'next/image'
 
 interface AuthProps {
@@ -6,7 +6,7 @@ interface AuthProps {
   imageSrc: string;
 }
 
-const Auth: FC<AuthProps> = ({ children, imageSrc }) => {
+const Auth = ({ children, imageSrc }: AuthProps) => {
   return (
     <div className='bg-teal-600 h-screen w-screen'>
         <div className='bg-teal-600 mt-5 flex flex-col items-center p-8'>
