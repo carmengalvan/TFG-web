@@ -9,7 +9,24 @@
 		"lint": "next lint",
 		"gen:watch": "dotenv -c development -- graphql-codegen --watch",
 		"gen": "dotenv -c development -- graphql-codegen",
-		"biome:check": "biome check ./src"
+		"biome:check": "biome check ./src",
+		"postinstall": "husky install",
+		"prepare": "husky"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+			"biome check --files-ignore-unknown=true",
+			"biome check --apply --no-errors-on-unmatched",
+			"biome check --apply --organize-imports-enabled=false --no-errors-on-unmatched",
+			"biome check --apply-unsafe --no-errors-on-unmatched",
+			"biome format --write --no-errors-on-unmatched",
+			"biome lint --apply --no-errors-on-unmatched"
+		]
 	},
 	"dependencies": {
 		"@apollo/client": "^3.8.9",
@@ -32,6 +49,7 @@
 		"graphql": "^16.8.1",
 		"lucide-react": "^0.299.0",
 		"next": "14.0.3",
+		"pre-commit": "^1.2.2",
 		"react": "^18",
 		"react-apollo-network-status": "^5.2.1",
 		"react-dom": "^18",
@@ -48,6 +66,8 @@
 		"@types/react-dom": "^18",
 		"autoprefixer": "^10.4.16",
 		"eslint-config-next": "14.0.3",
+		"husky": "^9.0.6",
+		"lint-staged": "^15.2.0",
 		"postcss": "^8.4.32",
 		"prettier": "3.1.1",
 		"tailwindcss": "^3.3.6",
