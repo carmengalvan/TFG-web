@@ -1,3 +1,4 @@
+import { paths } from '@/globals/paths';
 import { cn } from '@/lib/utils';
 import {
 	CalendarClock,
@@ -28,11 +29,13 @@ const Menu = () => {
 							title: 'Mi perfil',
 							icon: User,
 							variant: 'ghost',
+							href: paths.public.home,
 						},
 						{
 							title: 'Ayuda',
 							icon: HelpCircle,
 							variant: 'ghost',
+							href: paths.public.home,
 						},
 					]}
 				/>
@@ -44,17 +47,20 @@ const Menu = () => {
 							label: '5',
 							icon: Rocket,
 							variant: 'default',
+							href: paths.public.home,
 						},
 						{
 							title: 'Próximos eventos',
 							label: '7',
 							icon: CalendarClock,
 							variant: 'ghost',
+							href: paths.public.home,
 						},
 						{
 							title: 'Nuevo recurso',
 							icon: Plus,
 							variant: 'ghost',
+							href: paths.public.home,
 						},
 					]}
 				/>
@@ -65,6 +71,7 @@ const Menu = () => {
 							title: 'Cerrar sesión',
 							icon: LogOutIcon,
 							variant: 'ghost',
+							href: paths.public.home,
 						},
 					]}
 				/>
