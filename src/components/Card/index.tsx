@@ -36,7 +36,14 @@ const CustomCard = ({
 	availableTime,
 }: CustomCardProps) => {
 	const currentDate = new Date();
-
+	const formattedStartDate = `${startDate.getDate()} de ${startDate.toLocaleDateString(
+		'es-ES',
+		{ month: 'long' }
+	)} de ${startDate.getFullYear()}`;
+	const formattedEndDate = `${endDate.getDate()} de ${endDate.toLocaleDateString(
+		'es-ES',
+		{ month: 'long' }
+	)} de ${endDate.getFullYear()}`;
 	return (
 		<div className="mt-10">
 			<Card className="w-11/12 ml-5">
@@ -53,8 +60,7 @@ const CustomCard = ({
 					<div className="space-y-1">
 						<CardTitle>{title}</CardTitle>
 						<CardDescription>
-							Disponibilidad: {startDate.toDateString()} -{' '}
-							{endDate.toDateString()}
+							Disponibilidad: {formattedStartDate} - {formattedEndDate}
 						</CardDescription>
 					</div>
 					<div className="flex items-center space-x-1 rounded-md bg-secondary text-secondary-foreground">
