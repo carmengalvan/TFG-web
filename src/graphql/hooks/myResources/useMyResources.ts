@@ -43,7 +43,7 @@ export const useMyResources = ({
 				variables: {
 					pagination: {
 						page: data?.myResources.pageInfo.page + 1,
-						...loadMore,
+						pageSize: pagination?.pageSize,
 					},
 				},
 			});

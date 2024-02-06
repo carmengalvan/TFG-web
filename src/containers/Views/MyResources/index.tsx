@@ -1,6 +1,8 @@
 import CustomCard from '@/components/Card';
 import Header from '@/components/Header';
 import Menu from '@/components/Sidebar';
+import { Button } from '@/components/ui/button';
+import { SkipForward } from 'lucide-react';
 import { useConnect } from './connect';
 
 export function MyResourcesView() {
@@ -27,6 +29,9 @@ export function MyResourcesView() {
 							availableTime={resource.availableTime}
 						/>
 					))}
+					<Button onClick={loadMore} className="ml-5 mt-5">
+						<SkipForward />
+					</Button>
 				</div>
 			</div>
 		</>
