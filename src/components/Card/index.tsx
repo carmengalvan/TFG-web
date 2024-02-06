@@ -35,12 +35,20 @@ const CustomCard = ({
 	endDate,
 	availableTime,
 }: CustomCardProps) => {
+	const currentDate = new Date();
+
 	return (
 		<div className="mt-10">
 			<Card className="w-11/12 ml-5">
 				<CardHeader className="grid grid-cols-[auto,1fr_110px] items-start gap-4 space-y-0">
 					<div className="flex items-center">
-						<CircleIcon className="mr-1 fill-green-500 text-green-500" />
+						<CircleIcon
+							className={`mr-1 ${
+								currentDate >= startDate && currentDate <= endDate
+									? 'fill-green-500 text-green-500'
+									: 'fill-red-500 text-red-500'
+							}`}
+						/>
 					</div>
 					<div className="space-y-1">
 						<CardTitle>{title}</CardTitle>
