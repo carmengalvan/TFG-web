@@ -10,7 +10,11 @@ export function MyResourcesView() {
 		<>
 			<div className="flex flex-row w-full h-full">
 				<div className="w-[350px]">
-					<Menu />
+					<Menu
+						resourcesNumber={
+							resources.pageInfo ? resources.pageInfo.totalResults || 0 : 0
+						}
+					/>
 				</div>
 				<div className="w-full">
 					<Header title="Mis recursos" />
