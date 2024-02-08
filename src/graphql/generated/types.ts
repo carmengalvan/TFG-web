@@ -69,6 +69,11 @@ export type MediaUploadUrlType = {
 	uploadUrl: Scalars['String']['output'];
 };
 
+export type MonthInput = {
+	month: Scalars['Int']['input'];
+	year: Scalars['Int']['input'];
+};
+
 export type Mutation = {
 	changePassword: Scalars['Boolean']['output'];
 	/** Creates a day availability */
@@ -182,6 +187,7 @@ export type Query = {
 };
 
 export type QueryMyDailyAvailabilityArgs = {
+	input: MonthInput;
 	pagination?: InputMaybe<PaginationInput>;
 };
 
@@ -290,6 +296,30 @@ export type RegisterMutation = {
 		lastName: string;
 		email: string;
 		publicName: string;
+	};
+};
+
+export type CreateResourceMutationVariables = Exact<{
+	input: ResourceInput;
+}>;
+
+export type CreateResourceMutation = {
+	createResource: {
+		id: string;
+		name: string;
+		description: string;
+		availableTime: number;
+		startDate: string;
+		endDate: string;
+		location?: string | undefined;
+		user: {
+			id: string;
+			firstName: string;
+			lastName: string;
+			email: string;
+			publicName: string;
+			created: string;
+		};
 	};
 };
 
@@ -470,6 +500,96 @@ export const RegisterDocument = {
 		},
 	],
 } as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>;
+export const CreateResourceDocument = {
+	kind: 'Document',
+	definitions: [
+		{
+			kind: 'OperationDefinition',
+			operation: 'mutation',
+			name: { kind: 'Name', value: 'createResource' },
+			variableDefinitions: [
+				{
+					kind: 'VariableDefinition',
+					variable: {
+						kind: 'Variable',
+						name: { kind: 'Name', value: 'input' },
+					},
+					type: {
+						kind: 'NonNullType',
+						type: {
+							kind: 'NamedType',
+							name: { kind: 'Name', value: 'ResourceInput' },
+						},
+					},
+				},
+			],
+			selectionSet: {
+				kind: 'SelectionSet',
+				selections: [
+					{
+						kind: 'Field',
+						name: { kind: 'Name', value: 'createResource' },
+						arguments: [
+							{
+								kind: 'Argument',
+								name: { kind: 'Name', value: 'input' },
+								value: {
+									kind: 'Variable',
+									name: { kind: 'Name', value: 'input' },
+								},
+							},
+						],
+						selectionSet: {
+							kind: 'SelectionSet',
+							selections: [
+								{ kind: 'Field', name: { kind: 'Name', value: 'id' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'name' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'description' } },
+								{
+									kind: 'Field',
+									name: { kind: 'Name', value: 'availableTime' },
+								},
+								{ kind: 'Field', name: { kind: 'Name', value: 'startDate' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'endDate' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'location' } },
+								{
+									kind: 'Field',
+									name: { kind: 'Name', value: 'user' },
+									selectionSet: {
+										kind: 'SelectionSet',
+										selections: [
+											{ kind: 'Field', name: { kind: 'Name', value: 'id' } },
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'firstName' },
+											},
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'lastName' },
+											},
+											{ kind: 'Field', name: { kind: 'Name', value: 'email' } },
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'publicName' },
+											},
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'created' },
+											},
+										],
+									},
+								},
+							],
+						},
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<
+	CreateResourceMutation,
+	CreateResourceMutationVariables
+>;
 export const GetMeDocument = {
 	kind: 'Document',
 	definitions: [
