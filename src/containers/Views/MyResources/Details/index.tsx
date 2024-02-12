@@ -74,20 +74,22 @@ export function MyResourcesDetailsView() {
 		if (data.time_measurement === 'hours') {
 			data.available_time = data.available_time * 60;
 		}
-		console.log('Data onSubmit', data);
-		// try {
-		// 	const response = await createResource({
-		// 		name: data.name,
-		// 		description: data.description,
-		// 		location: data.location,
-		// 		availableTime: data.available_time,
-		// 		startDate: String(data.date_range.from),
-		// 		endDate: String(data.date_range.to),
-		// 	});
-		// 	if (response) await push(paths.public.home);
-		// } catch (e) {
-		// 	console.error('Error en la solicitud al backend:', e);
-		// }
+		try {
+			const startDateString = date?.from ? format(date.from, 'yyyy-MM-dd') : '';
+			const endDateString = date?.to ? format(date.to, 'yyyy-MM-dd') : '';
+
+			const response = await createResource({
+				name: data.name,
+				description: data.description,
+				location: data.location,
+				availableTime: data.available_time,
+				startDate: startDateString,
+				endDate: endDateString,
+			});
+			if (response) await push(paths.public.home);
+		} catch (e) {
+			console.error('Error en la solicitud al backend:', e);
+		}
 		toast({
 			title: 'You submitted the following values:',
 			description: (
@@ -111,14 +113,9 @@ export function MyResourcesDetailsView() {
 				<div className="w-full">
 					<Header title="Crear nuevo recurso" />
 					<Form {...form}>
-						{/* <form
-							onSubmit={form.handleSubmit(onSubmit)}
-							className="w-full mt-16 flex flex-row"
-						> */}
 						<form
 							onSubmit={(e) => {
 								e.preventDefault();
-								console.log('Data before submitting:', form.getValues());
 								form.handleSubmit(onSubmit)(e);
 							}}
 							className="w-full mt-16 flex flex-row"
@@ -222,64 +219,53 @@ export function MyResourcesDetailsView() {
 									<Button type="submit">Continuar</Button>
 								</div>
 							</div>
-							{/* <div className="w-2/5 ml-10">
+							<div className="w-2/5 ml-10">
 								<p className="text-xl">Disponibilidad</p>
-								<FormField
-									control={form.control}
-									name="date_range"
-									render={({ field }) => (
-										<FormItem className="flex flex-col mt-10">
-											<FormLabel>Rango de fechas</FormLabel>
-											<Popover>
-												<PopoverTrigger asChild>
-													<Button
-														id="date_range"
-														variant={'outline'}
-														className={cn(
-															'w-[300px] justify-start text-left font-normal',
-															!date && 'text-muted-foreground'
-														)}
-													>
-														<CalendarIcon className="mr-2 h-4 w-4" />
-														{date?.from ? (
-															date.to ? (
-																<>
-																	{format(date.from, 'LLL dd, y')} -{' '}
-																	{format(date.to, 'LLL dd, y')}
-																</>
-															) : (
-																format(date.from, 'LLL dd, y')
-															)
-														) : (
-															<span>Selecciona un rango de fechas</span>
-														)}
-													</Button>
-												</PopoverTrigger>
-												<PopoverContent className="w-auto p-0" align="start">
-													<Calendar
-														initialFocus
-														mode="range"
-														defaultMonth={date?.from}
-														selected={date}
-														onSelect={setDate}
-														numberOfMonths={2}
-													/>
-												</PopoverContent>
-											</Popover>
-											<FormDescription>
-												Selecciona el rango de fechas en que estará disponible
-												el recurso.
-											</FormDescription>
-											<FormMessage />
-											<input
-												type="hidden"
-												{...field}
-												value={JSON.stringify(field.value)}
+
+								<FormItem className="flex flex-col mt-10">
+									<FormLabel>Rango de fechas</FormLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<Button
+												variant={'outline'}
+												className={cn(
+													'w-[300px] justify-start text-left font-normal',
+													!date && 'text-muted-foreground'
+												)}
+											>
+												<CalendarIcon className="mr-2 h-4 w-4" />
+												{date?.from ? (
+													date.to ? (
+														<>
+															{format(date.from, 'LLL dd, y')} -{' '}
+															{format(date.to, 'LLL dd, y')}
+														</>
+													) : (
+														format(date.from, 'LLL dd, y')
+													)
+												) : (
+													<span>Selecciona un rango de fechas</span>
+												)}
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0" align="start">
+											<Calendar
+												initialFocus
+												mode="range"
+												defaultMonth={date?.from}
+												selected={date}
+												onSelect={setDate}
+												numberOfMonths={2}
 											/>
-										</FormItem>
-									)}
-								/>
-							</div> */}
+										</PopoverContent>
+									</Popover>
+									<FormDescription>
+										Selecciona el rango de fechas en que estará disponible el
+										recurso.
+									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							</div>
 						</form>
 					</Form>
 				</div>
