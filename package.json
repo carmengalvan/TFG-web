@@ -10,6 +10,8 @@
 		"gen:watch": "dotenv -c development -- graphql-codegen --watch",
 		"gen": "dotenv -c development -- graphql-codegen",
 		"biome:check": "biome check ./src",
+		"biome:format": "biome format ./src --write",
+		"biome:lint": "biome lint ./src",
 		"postinstall": "husky install",
 		"prepare": "husky"
 	},
