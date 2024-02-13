@@ -47,10 +47,6 @@ const FormSchema = z.object({
 	time_measurement: z.string({
 		required_error: 'Please select a measurement to display.',
 	}),
-	// date_range: z.object({
-	// 	from: z.date(),
-	// 	to: z.date(),
-	// }),
 	location: z.string(),
 });
 
@@ -90,14 +86,6 @@ export function MyResourcesDetailsView() {
 		} catch (e) {
 			console.error('Error en la solicitud al backend:', e);
 		}
-		toast({
-			title: 'You submitted the following values:',
-			description: (
-				<pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-					<code className="text-white">{JSON.stringify(data, null, 2)}</code>
-				</pre>
-			),
-		});
 	};
 
 	return (
