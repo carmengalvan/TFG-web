@@ -323,6 +323,12 @@ export type CreateResourceMutation = {
 	};
 };
 
+export type DeleteResourceMutationVariables = Exact<{
+	id: Scalars['UUID']['input'];
+}>;
+
+export type DeleteResourceMutation = { deleteResource: boolean };
+
 export type GetMeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetMeQuery = {
@@ -500,6 +506,7 @@ export const RegisterDocument = {
 		},
 	],
 } as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>;
+
 export const CreateResourceDocument = {
 	kind: 'Document',
 	definitions: [
@@ -590,6 +597,49 @@ export const CreateResourceDocument = {
 	CreateResourceMutation,
 	CreateResourceMutationVariables
 >;
+export const DeleteResourceDocument = {
+	kind: 'Document',
+	definitions: [
+		{
+			kind: 'OperationDefinition',
+			operation: 'mutation',
+			name: { kind: 'Name', value: 'deleteResource' },
+			variableDefinitions: [
+				{
+					kind: 'VariableDefinition',
+					variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+					type: {
+						kind: 'NonNullType',
+						type: { kind: 'NamedType', name: { kind: 'Name', value: 'UUID' } },
+					},
+				},
+			],
+			selectionSet: {
+				kind: 'SelectionSet',
+				selections: [
+					{
+						kind: 'Field',
+						name: { kind: 'Name', value: 'deleteResource' },
+						arguments: [
+							{
+								kind: 'Argument',
+								name: { kind: 'Name', value: 'id' },
+								value: {
+									kind: 'Variable',
+									name: { kind: 'Name', value: 'id' },
+								},
+							},
+						],
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<
+	DeleteResourceMutation,
+	DeleteResourceMutationVariables
+>;
+        
 export const GetMeDocument = {
 	kind: 'Document',
 	definitions: [
