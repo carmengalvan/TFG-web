@@ -639,7 +639,7 @@ export const DeleteResourceDocument = {
 	DeleteResourceMutation,
 	DeleteResourceMutationVariables
 >;
-        
+
 export const GetMeDocument = {
 	kind: 'Document',
 	definitions: [
