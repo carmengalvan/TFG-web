@@ -19,60 +19,12 @@ import {
 } from '../../../components/ui/form';
 import { Input } from '../../../components/ui/input';
 import { useConnect } from './connect';
-
-const weekdays = [
-	{
-		id: 'Monday',
-		label: 'Lunes',
-	},
-	{
-		id: 'Tuesday',
-		label: 'Martes',
-	},
-	{
-		id: 'Wednesday',
-		label: 'Miércoles',
-	},
-	{
-		id: 'Thursday',
-		label: 'Jueves',
-	},
-	{
-		id: 'Friday',
-		label: 'Viernes',
-	},
-	{
-		id: 'Saturday',
-		label: 'Sábado',
-	},
-	{
-		id: 'Sunday',
-		label: 'Domingo',
-	},
-] as const;
+import { weekdays } from './constants';
 
 const FormSchema = z.object({
 	weekdays: z.array(z.string()).refine((value) => value.some((item) => item), {
 		message: 'You have to select at least one item.',
 	}),
-	// startTime: z.string().refine(
-	// 	(value) => {
-	// 		const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
-	// 		return timeRegex.test(value);
-	// 	},
-	// 	{
-	// 		message: 'The startTime must be in HH:MM:SS format.',
-	// 	}
-	// ),
-	// endTime: z.string().refine(
-	// 	(value) => {
-	// 		const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
-	// 		return timeRegex.test(value);
-	// 	},
-	// 	{
-	// 		message: 'The endTime must be in HH:MM:SS format.',
-	// 	}
-	// ),
 });
 
 interface CheckboxReactHookFormMultipleProps {
