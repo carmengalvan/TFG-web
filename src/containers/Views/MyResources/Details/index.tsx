@@ -25,13 +25,11 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { CheckboxReactHookFormMultiple } from '@/containers/Layout/CheckboxReactHookFormMultiple';
-import { paths } from '@/globals/paths';
 import { useResourceActions } from '@/graphql/hooks/myResources/useResourceActions';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addDays, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useForm } from 'react-hook-form';
@@ -62,11 +60,13 @@ export function MyResourcesDetailsView() {
 		resolver: zodResolver(FormSchema),
 	});
 
-	const { createResource, isCreateLoading } = useResourceActions();
-
-	const { push } = useRouter();
+	const { createResource } = useResourceActions();
 
 	const [showCheckbox, setShowCheckbox] = useState(false);
+
+	const [resourceId, setResourceId] = useState<string>('');
+	const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		if (data.time_measurement === 'hours') {
@@ -85,6 +85,9 @@ export function MyResourcesDetailsView() {
 				endDate: endDateString,
 			});
 			if (response?.id) {
+				setResourceId(response.id);
+				setStartDate(date?.from);
+				setEndDate(date?.to);
 				setShowCheckbox(true);
 			}
 		} catch (e) {
@@ -277,7 +280,13 @@ export function MyResourcesDetailsView() {
 						</div>
 						<div className="w-full">
 							<Header title="Crear nuevo recurso" />
-							<CheckboxReactHookFormMultiple />
+							{startDate && endDate && (
+								<CheckboxReactHookFormMultiple
+									resourceId={resourceId}
+									startDate={startDate}
+									endDate={endDate}
+								/>
+							)}
 						</div>
 					</>
 				)}

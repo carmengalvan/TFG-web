@@ -1,7 +1,10 @@
+import { useDayAvailabilityActions } from '@/graphql/hooks/myDayAvailability/useDayAvailabilityActions';
 import { useState } from 'react';
 
 export const useConnect = () => {
 	const [timeSlots, setTimeSlots] = useState<{ [key: string]: string[][] }>({});
+
+	const { createDayAvailability } = useDayAvailabilityActions();
 
 	function handleAddTimeSlot(day: string) {
 		setTimeSlots((prevTimeSlots) => ({
@@ -22,5 +25,6 @@ export const useConnect = () => {
 		setTimeSlots,
 		handleAddTimeSlot,
 		handleRemoveTimeSlot,
+		createDayAvailability,
 	};
 };

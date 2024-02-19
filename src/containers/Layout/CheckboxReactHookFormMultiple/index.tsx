@@ -1,5 +1,8 @@
+import { paths } from '@/globals/paths';
+import { getDayOfWeek, getDaysBetweenDates } from '@/utils/getDaysBetweenDates';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PlusCircle, X } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -15,76 +18,131 @@ import {
 	FormMessage,
 } from '../../../components/ui/form';
 import { Input } from '../../../components/ui/input';
-import { toast } from '../../../components/ui/use-toast';
 import { useConnect } from './connect';
 
-const items = [
+const weekdays = [
 	{
-		id: 'lunes',
+		id: 'Monday',
 		label: 'Lunes',
 	},
 	{
-		id: 'martes',
+		id: 'Tuesday',
 		label: 'Martes',
 	},
 	{
-		id: 'miercoles',
+		id: 'Wednesday',
 		label: 'Miércoles',
 	},
 	{
-		id: 'jueves',
+		id: 'Thursday',
 		label: 'Jueves',
 	},
 	{
-		id: 'viernes',
+		id: 'Friday',
 		label: 'Viernes',
 	},
 	{
-		id: 'sabado',
+		id: 'Saturday',
 		label: 'Sábado',
 	},
 	{
-		id: 'domingo',
+		id: 'Sunday',
 		label: 'Domingo',
 	},
 ] as const;
 
 const FormSchema = z.object({
-	items: z.array(z.string()).refine((value) => value.some((item) => item), {
+	weekdays: z.array(z.string()).refine((value) => value.some((item) => item), {
 		message: 'You have to select at least one item.',
 	}),
+	// startTime: z.string().refine(
+	// 	(value) => {
+	// 		const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+	// 		return timeRegex.test(value);
+	// 	},
+	// 	{
+	// 		message: 'The startTime must be in HH:MM:SS format.',
+	// 	}
+	// ),
+	// endTime: z.string().refine(
+	// 	(value) => {
+	// 		const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+	// 		return timeRegex.test(value);
+	// 	},
+	// 	{
+	// 		message: 'The endTime must be in HH:MM:SS format.',
+	// 	}
+	// ),
 });
 
-export function CheckboxReactHookFormMultiple() {
-	const { timeSlots, setTimeSlots, handleAddTimeSlot, handleRemoveTimeSlot } =
-		useConnect();
+interface CheckboxReactHookFormMultipleProps {
+	resourceId: string;
+	startDate: Date;
+	endDate: Date;
+}
+
+export const CheckboxReactHookFormMultiple = ({
+	resourceId,
+	startDate,
+	endDate,
+}: CheckboxReactHookFormMultipleProps) => {
+	const {
+		timeSlots,
+		setTimeSlots,
+		handleAddTimeSlot,
+		handleRemoveTimeSlot,
+		createDayAvailability,
+	} = useConnect();
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
-			items: ['recents', 'home'],
+			weekdays: ['recents', 'home'],
 		},
 	});
 
-	function onSubmit(data: z.infer<typeof FormSchema>) {
-		console.log(data);
+	const { push } = useRouter();
+
+	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		try {
+			const days = getDaysBetweenDates(startDate, endDate, data.weekdays);
+			for (const day of days) {
+				const dayOfWeek = getDayOfWeek(day);
+				for (const timeSlot of timeSlots[dayOfWeek]) {
+					const response = await createDayAvailability({
+						resourceId: resourceId,
+						input: {
+							day: day,
+							startTime: timeSlot[0],
+							endTime: timeSlot[1],
+						},
+					});
+				}
+			}
+			await push(paths.public.home);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
 	useEffect(() => {
-		form.setValue('items', selectedItems);
+		form.setValue('weekdays', selectedItems);
 	}, [form.setValue, selectedItems]);
 
 	return (
 		<Form {...form}>
 			<form
-				onSubmit={form.handleSubmit(onSubmit)}
+				onSubmit={(e) => {
+					e.preventDefault();
+					form.handleSubmit(onSubmit)(e);
+				}}
 				className="space-y-8 mt-10 ml-32"
 			>
 				<FormField
 					control={form.control}
-					name="items"
+					name="weekdays"
 					render={() => (
 						<FormItem>
 							<div className="mb-4">
@@ -96,7 +154,7 @@ export function CheckboxReactHookFormMultiple() {
 									estará disponible
 								</FormDescription>
 							</div>
-							{items.map((item) => (
+							{weekdays.map((item) => (
 								<FormItem
 									key={item.id}
 									className="flex items-center space-x-3 space-y-0"
@@ -124,31 +182,42 @@ export function CheckboxReactHookFormMultiple() {
 														key={`${item.id}-${slotIndex}`}
 														className="flex items-center space-x-2"
 													>
-														<Input
-															placeholder="Hora de inicio"
-															value={timeSlot[0]}
-															onChange={(e) => {
-																const newTimeSlots = { ...timeSlots };
-																newTimeSlots[item.id][slotIndex][0] =
-																	e.target.value;
-																setTimeSlots(newTimeSlots);
-															}}
-														/>
+														<FormItem>
+															<FormControl>
+																<Input
+																	placeholder="Hora de inicio"
+																	type="time"
+																	value={timeSlot[0]}
+																	onChange={(e) => {
+																		const newTimeSlots = { ...timeSlots };
+																		newTimeSlots[item.id][slotIndex][0] =
+																			e.target.value;
+																		setTimeSlots(newTimeSlots);
+																	}}
+																/>
+															</FormControl>
+															<FormMessage />
+														</FormItem>
+
 														<p className="mx-2"> - </p>
-														<Input
-															placeholder="Hora de final"
-															value={timeSlot[1]}
-															onChange={(e) => {
-																const newTimeSlots = { ...timeSlots };
-																newTimeSlots[item.id][slotIndex][1] =
-																	e.target.value;
-																setTimeSlots(newTimeSlots);
-															}}
-														/>
+														<FormItem>
+															<FormControl>
+																<Input
+																	placeholder="Hora de final"
+																	type="time"
+																	value={timeSlot[1]}
+																	onChange={(e) => {
+																		const newTimeSlots = { ...timeSlots };
+																		newTimeSlots[item.id][slotIndex][1] =
+																			e.target.value;
+																		setTimeSlots(newTimeSlots);
+																	}}
+																/>
+															</FormControl>
+															<FormMessage />
+														</FormItem>
 														{timeSlots[item.id]?.length >= 1 && (
 															<X
-																width={50}
-																height={50}
 																onClick={() => handleRemoveTimeSlot(item.id, 0)}
 															/>
 														)}
@@ -156,12 +225,7 @@ export function CheckboxReactHookFormMultiple() {
 												))}
 											</div>
 											<div className="flex items-center space-x-2">
-												<Input placeholder="Hora de inicio" />
-												<p className="mx-2"> - </p>
-												<Input placeholder="Hora de final" />
 												<PlusCircle
-													width={50}
-													height={50}
 													onClick={() => handleAddTimeSlot(item.id)}
 												/>
 											</div>
@@ -181,4 +245,4 @@ export function CheckboxReactHookFormMultiple() {
 			</form>
 		</Form>
 	);
-}
+};

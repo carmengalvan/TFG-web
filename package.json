@@ -12,6 +12,7 @@
 		"biome:check": "biome check ./src",
 		"biome:format": "biome format ./src --write",
 		"biome:lint": "biome lint ./src",
+		"biome:apply": "biome check --apply ./src",
 		"postinstall": "husky install",
 		"prepare": "husky"
 	},
