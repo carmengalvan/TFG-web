@@ -1,19 +1,17 @@
-import { eachDayOfInterval, endOfWeek, format, startOfWeek } from 'date-fns';
+import { eachDayOfInterval, format } from 'date-fns';
 
 export function getDaysBetweenDates(
 	startDate: Date,
 	endDate: Date,
 	weekdays: string[]
 ) {
-	const startDayOfWeek = startOfWeek(startDate);
-	const endDayOfWeek = endOfWeek(endDate);
-
 	const matchingDates: string[] = [];
 
 	const daysBetween = eachDayOfInterval({
-		start: startDayOfWeek,
-		end: endDayOfWeek,
+		start: startDate,
+		end: endDate,
 	});
+
 	for (const day of daysBetween) {
 		if (weekdays.includes(format(day, 'EEEE'))) {
 			matchingDates.push(format(day, 'yyyy-MM-dd'));

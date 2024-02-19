@@ -170,7 +170,9 @@ export const CheckboxReactHookFormMultiple = ({
 														</FormItem>
 														{timeSlots[item.id]?.length >= 1 && (
 															<X
-																onClick={() => handleRemoveTimeSlot(item.id, 0)}
+																onClick={() =>
+																	handleRemoveTimeSlot(item.id, slotIndex)
+																}
 															/>
 														)}
 													</div>
