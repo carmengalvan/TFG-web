@@ -28,12 +28,14 @@ const FormSchema = z.object({
 });
 
 interface CheckboxReactHookFormMultipleProps {
+	onButtonClick: () => void;
 	resourceId: string;
 	startDate: Date;
 	endDate: Date;
 }
 
 export const CheckboxReactHookFormMultiple = ({
+	onButtonClick,
 	resourceId,
 	startDate,
 	endDate,
@@ -53,8 +55,6 @@ export const CheckboxReactHookFormMultiple = ({
 		},
 	});
 
-	const { push } = useRouter();
-
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		try {
 			const days = getDaysBetweenDates(startDate, endDate, data.weekdays);
@@ -71,7 +71,7 @@ export const CheckboxReactHookFormMultiple = ({
 					});
 				}
 			}
-			await push(paths.public.home);
+			onButtonClick();
 		} catch (error) {
 			console.error(error);
 		}

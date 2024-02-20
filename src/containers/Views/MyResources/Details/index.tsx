@@ -63,6 +63,12 @@ export function MyResourcesDetailsView() {
 	const { createResource } = useResourceActions();
 
 	const [showCheckbox, setShowCheckbox] = useState(false);
+	const [showThird, setShowThird] = useState(false);
+
+	const handleCheckboxButton = () => {
+		setShowCheckbox(false);
+		setShowThird(true);
+	};
 
 	const [resourceId, setResourceId] = useState<string>('');
 	const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -98,7 +104,33 @@ export function MyResourcesDetailsView() {
 	return (
 		<>
 			<div className="flex flex-row w-full h-full">
-				{!showCheckbox ? (
+				{showThird ? (
+					<>
+						<div className="w-[350px]">
+							<Menu
+								resourcesNumber={
+									resources.pageInfo ? resources.pageInfo.totalResults || 0 : 0
+								}
+							/>
+						</div>
+						<div className="w-full">
+							<Header title="Crear nuevo recurso" />
+							<h2 className="mt-10 ml-32 text-2xl">Disponibilidad</h2>
+							<p className="mt-5 ml-32">
+								¿Hay algún día en el que tu recurso no esté disponible?
+							</p>
+							<div className="flex flex-row w-full mt-5 ml-32">
+								<Calendar
+									initialFocus
+									mode="range"
+									defaultMonth={date?.from}
+									selected={{ from: startDate, to: endDate }}
+									numberOfMonths={1}
+								/>
+							</div>
+						</div>
+					</>
+				) : !showCheckbox ? (
 					<>
 						<div className="w-[350px]">
 							<Menu
@@ -285,6 +317,7 @@ export function MyResourcesDetailsView() {
 									resourceId={resourceId}
 									startDate={startDate}
 									endDate={endDate}
+									onButtonClick={handleCheckboxButton}
 								/>
 							)}
 						</div>
