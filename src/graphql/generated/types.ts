@@ -329,6 +329,35 @@ export type CreateDayAvailabilityMutation = {
 	};
 };
 
+export type UpdateDayAvailabilityMutationVariables = Exact<{
+	input: UpdateDayAvailabilityInput;
+}>;
+
+export type UpdateDayAvailabilityMutation = {
+	updateDayAvailability: {
+		id: string;
+		day: string;
+		startTime: string;
+		endTime: string;
+		resource: {
+			id: string;
+			name: string;
+			description: string;
+			availableTime: number;
+			startDate: string;
+			endDate: string;
+			user: {
+				id: string;
+				firstName: string;
+				lastName: string;
+				email: string;
+				publicName: string;
+				created: string;
+			};
+		};
+	};
+};
+
 export type CreateResourceMutationVariables = Exact<{
 	input: ResourceInput;
 }>;
@@ -671,6 +700,123 @@ export const CreateDayAvailabilityDocument = {
 } as unknown as DocumentNode<
 	CreateDayAvailabilityMutation,
 	CreateDayAvailabilityMutationVariables
+>;
+export const UpdateDayAvailabilityDocument = {
+	kind: 'Document',
+	definitions: [
+		{
+			kind: 'OperationDefinition',
+			operation: 'mutation',
+			name: { kind: 'Name', value: 'updateDayAvailability' },
+			variableDefinitions: [
+				{
+					kind: 'VariableDefinition',
+					variable: {
+						kind: 'Variable',
+						name: { kind: 'Name', value: 'input' },
+					},
+					type: {
+						kind: 'NonNullType',
+						type: {
+							kind: 'NamedType',
+							name: { kind: 'Name', value: 'UpdateDayAvailabilityInput' },
+						},
+					},
+				},
+			],
+			selectionSet: {
+				kind: 'SelectionSet',
+				selections: [
+					{
+						kind: 'Field',
+						name: { kind: 'Name', value: 'updateDayAvailability' },
+						arguments: [
+							{
+								kind: 'Argument',
+								name: { kind: 'Name', value: 'input' },
+								value: {
+									kind: 'Variable',
+									name: { kind: 'Name', value: 'input' },
+								},
+							},
+						],
+						selectionSet: {
+							kind: 'SelectionSet',
+							selections: [
+								{
+									kind: 'Field',
+									name: { kind: 'Name', value: 'resource' },
+									selectionSet: {
+										kind: 'SelectionSet',
+										selections: [
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'user' },
+												selectionSet: {
+													kind: 'SelectionSet',
+													selections: [
+														{
+															kind: 'Field',
+															name: { kind: 'Name', value: 'id' },
+														},
+														{
+															kind: 'Field',
+															name: { kind: 'Name', value: 'firstName' },
+														},
+														{
+															kind: 'Field',
+															name: { kind: 'Name', value: 'lastName' },
+														},
+														{
+															kind: 'Field',
+															name: { kind: 'Name', value: 'email' },
+														},
+														{
+															kind: 'Field',
+															name: { kind: 'Name', value: 'publicName' },
+														},
+														{
+															kind: 'Field',
+															name: { kind: 'Name', value: 'created' },
+														},
+													],
+												},
+											},
+											{ kind: 'Field', name: { kind: 'Name', value: 'id' } },
+											{ kind: 'Field', name: { kind: 'Name', value: 'name' } },
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'description' },
+											},
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'availableTime' },
+											},
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'startDate' },
+											},
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'endDate' },
+											},
+										],
+									},
+								},
+								{ kind: 'Field', name: { kind: 'Name', value: 'id' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'day' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'startTime' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'endTime' } },
+							],
+						},
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<
+	UpdateDayAvailabilityMutation,
+	UpdateDayAvailabilityMutationVariables
 >;
 export const CreateResourceDocument = {
 	kind: 'Document',

@@ -1,8 +1,6 @@
-import { paths } from '@/globals/paths';
 import { getDayOfWeek, getDaysBetweenDates } from '@/utils/getDaysBetweenDates';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PlusCircle, X } from 'lucide-react';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
