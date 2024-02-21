@@ -10,7 +10,7 @@ import {
 	UpdateDayAvailabilityMutationVariables,
 } from '@/graphql/generated/types';
 import { ApolloError, useMutation } from '@apollo/client';
-import { use, useCallback } from 'react';
+import { useCallback } from 'react';
 
 export function useDayAvailabilityActions() {
 	const [performCreate] = useMutation<

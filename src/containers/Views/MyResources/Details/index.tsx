@@ -24,12 +24,13 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { CalendarSelect } from '@/containers/Layout/CalendarSelect';
 import { CheckboxReactHookFormMultiple } from '@/containers/Layout/CheckboxReactHookFormMultiple';
 import { useResourceActions } from '@/graphql/hooks/myResources/useResourceActions';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addDays, format, isSameDay, isWithinInterval } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, PlusCircle, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useForm } from 'react-hook-form';
@@ -74,31 +75,6 @@ export function MyResourcesDetailsView() {
 	const [startDate, setStartDate] = useState<Date | undefined>(undefined);
 	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
-	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
-
-	const handleDayClick = (day: Date) => {
-		if (
-			startDate &&
-			endDate &&
-			isWithinInterval(day, { start: startDate, end: endDate })
-		) {
-			const isAlreadySelected = selectedDays.some((selectedDay) =>
-				isSameDay(selectedDay, day)
-			);
-
-			if (isAlreadySelected) {
-				setSelectedDays((prevSelectedDays) =>
-					prevSelectedDays.filter((selectedDay) => !isSameDay(selectedDay, day))
-				);
-			} else {
-				setSelectedDays((prevSelectedDays) => [...prevSelectedDays, day]);
-			}
-		}
-	};
-	const sortedSelectedDays = selectedDays
-		.slice()
-		.sort((a, b) => a.getTime() - b.getTime());
-
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		if (data.time_measurement === 'hours') {
 			data.available_time = data.available_time * 60;
@@ -140,35 +116,13 @@ export function MyResourcesDetailsView() {
 						</div>
 						<div className="w-full">
 							<Header title="Crear nuevo recurso" />
-							<h2 className="mt-10 ml-32 text-2xl">Disponibilidad</h2>
-							<p className="mt-5 ml-32">
-								¿Hay algún día en el que tu recurso no esté disponible?
-							</p>
-							<div className="flex flex-row w-full mt-5 ml-28">
-								<Calendar
-									initialFocus
-									mode="range"
-									defaultMonth={date?.from}
-									selected={{ from: startDate, to: endDate }}
-									numberOfMonths={2}
-									onDayClick={handleDayClick}
+							{date && startDate && endDate && (
+								<CalendarSelect
+									date={date}
+									startDate={startDate}
+									endDate={endDate}
 								/>
-								{sortedSelectedDays.length > 0 && (
-									<div className="ml-8">
-										<p>Fechas seleccionadas:</p>
-										<ul className="mt-2">
-											{sortedSelectedDays.map((day) => (
-												<li className="mt-2" key={day.getTime()}>
-													{day.toLocaleDateString()}
-												</li>
-											))}
-										</ul>
-									</div>
-								)}
-							</div>
-							<div className="mt-10 mb-5 ml-32">
-								<Button type="submit">Guardar</Button>
-							</div>
+							)}
 						</div>
 					</>
 				) : !showCheckbox ? (

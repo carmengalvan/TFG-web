@@ -1,0 +1,87 @@
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Input } from '@/components/ui/input';
+import { addDays, isSameDay, isWithinInterval } from 'date-fns';
+import { PlusCircle, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { DateRange } from 'react-day-picker';
+
+interface CalendarSelectProps {
+	startDate: Date;
+	endDate: Date;
+	date: DateRange;
+}
+
+export const CalendarSelect = ({
+	startDate,
+	endDate,
+	date,
+}: CalendarSelectProps) => {
+	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
+
+	const handleDayClick = (day: Date) => {
+		if (
+			(startDate &&
+				endDate &&
+				isWithinInterval(day, { start: startDate, end: endDate })) ||
+			isSameDay(day, startDate)
+		) {
+			const isAlreadySelected = selectedDays.some((selectedDay) =>
+				isSameDay(selectedDay, day)
+			);
+
+			if (isAlreadySelected) {
+				setSelectedDays((prevSelectedDays) =>
+					prevSelectedDays.filter((selectedDay) => !isSameDay(selectedDay, day))
+				);
+			} else {
+				setSelectedDays((prevSelectedDays) => [...prevSelectedDays, day]);
+			}
+		}
+	};
+	const sortedSelectedDays = selectedDays
+		.slice()
+		.sort((a, b) => a.getTime() - b.getTime());
+
+	return (
+		<>
+			<h2 className="mt-10 ml-32 text-2xl">Disponibilidad</h2>
+			<p className="mt-5 ml-32">
+				¿Hay algún día en el que tu recurso no esté disponible?
+			</p>
+			<div className="flex flex-row w-full mt-5 ml-28">
+				<Calendar
+					initialFocus
+					mode="range"
+					defaultMonth={date?.from}
+					selected={{ from: startDate, to: endDate }}
+					numberOfMonths={2}
+					onDayClick={handleDayClick}
+				/>
+				{sortedSelectedDays.length > 0 && (
+					<div className="ml-8">
+						<p>Fechas seleccionadas:</p>
+						<ul className="mt-2">
+							{sortedSelectedDays.map((day) => (
+								<li
+									className="mt-2 flex items-center space-x-2"
+									key={day.getTime()}
+								>
+									{day.toLocaleDateString()}
+									<Input className="ml-5" type="time" />
+									<p className="mx-2"> - </p>
+									<Input type="time" />
+									<X />
+									<PlusCircle />
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
+			</div>
+			<div className="mt-10 mb-5 ml-32">
+				<Button type="submit">Guardar</Button>
+			</div>
+		</>
+	);
+};
