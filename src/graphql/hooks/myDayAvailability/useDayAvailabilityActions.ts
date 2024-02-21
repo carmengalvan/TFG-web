@@ -2,18 +2,26 @@ import {
 	CreateDayAvailabilityDocument,
 	CreateDayAvailabilityMutation,
 	CreateDayAvailabilityMutationVariables,
+	DeleteDayAvailabilityDocument,
+	DeleteDayAvailabilityMutation,
+	DeleteDayAvailabilityMutationVariables,
 	UpdateDayAvailabilityDocument,
 	UpdateDayAvailabilityMutation,
 	UpdateDayAvailabilityMutationVariables,
 } from '@/graphql/generated/types';
-import { useMutation } from '@apollo/client';
-import { useCallback } from 'react';
+import { ApolloError, useMutation } from '@apollo/client';
+import { use, useCallback } from 'react';
 
 export function useDayAvailabilityActions() {
 	const [performCreate] = useMutation<
 		CreateDayAvailabilityMutation,
 		CreateDayAvailabilityMutationVariables
 	>(CreateDayAvailabilityDocument);
+
+	const [performDelete] = useMutation<
+		DeleteDayAvailabilityMutation,
+		DeleteDayAvailabilityMutationVariables
+	>(DeleteDayAvailabilityDocument);
 
 	const [performUpdate] = useMutation<
 		UpdateDayAvailabilityMutation,
@@ -30,6 +38,24 @@ export function useDayAvailabilityActions() {
 		[performCreate]
 	);
 
+	const deleteDayAvailability = useCallback(
+		async (id: DeleteDayAvailabilityMutationVariables['id']) => {
+			try {
+				const { data } = await performDelete({
+					variables: { id },
+				});
+				if (data?.deleteDayAvailability) {
+					return true;
+				}
+			} catch (e) {
+				if (e instanceof ApolloError) {
+					throw e;
+				}
+			}
+		},
+		[performDelete]
+	);
+
 	const updateDayAvailability = useCallback(
 		async (input: UpdateDayAvailabilityMutationVariables['input']) => {
 			const raw = await performUpdate({
@@ -42,6 +68,7 @@ export function useDayAvailabilityActions() {
 
 	return {
 		createDayAvailability,
+		deleteDayAvailability,
 		updateDayAvailability,
 	};
 }

@@ -329,6 +329,12 @@ export type CreateDayAvailabilityMutation = {
 	};
 };
 
+export type DeleteDayAvailabilityMutationVariables = Exact<{
+	id: Scalars['UUID']['input'];
+}>;
+
+export type DeleteDayAvailabilityMutation = { deleteDayAvailability: boolean };
+
 export type UpdateDayAvailabilityMutationVariables = Exact<{
 	input: UpdateDayAvailabilityInput;
 }>;
@@ -399,6 +405,29 @@ export type GetMeQuery = {
 		publicName: string;
 		created: string;
 		token: string;
+	};
+};
+
+export type MyDailyAvailabilityQueryVariables = Exact<{
+	pagination?: InputMaybe<PaginationInput>;
+	input: MonthInput;
+}>;
+
+export type MyDailyAvailabilityQuery = {
+	myDailyAvailability: {
+		pageInfo: {
+			page: number;
+			pages: number;
+			totalResults: number;
+			hasNext: boolean;
+		};
+		edges: Array<{
+			id: string;
+			day: string;
+			startTime: string;
+			endTime: string;
+			resource: { name: string; description: string };
+		}>;
 	};
 };
 
@@ -701,6 +730,48 @@ export const CreateDayAvailabilityDocument = {
 	CreateDayAvailabilityMutation,
 	CreateDayAvailabilityMutationVariables
 >;
+export const DeleteDayAvailabilityDocument = {
+	kind: 'Document',
+	definitions: [
+		{
+			kind: 'OperationDefinition',
+			operation: 'mutation',
+			name: { kind: 'Name', value: 'deleteDayAvailability' },
+			variableDefinitions: [
+				{
+					kind: 'VariableDefinition',
+					variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+					type: {
+						kind: 'NonNullType',
+						type: { kind: 'NamedType', name: { kind: 'Name', value: 'UUID' } },
+					},
+				},
+			],
+			selectionSet: {
+				kind: 'SelectionSet',
+				selections: [
+					{
+						kind: 'Field',
+						name: { kind: 'Name', value: 'deleteDayAvailability' },
+						arguments: [
+							{
+								kind: 'Argument',
+								name: { kind: 'Name', value: 'id' },
+								value: {
+									kind: 'Variable',
+									name: { kind: 'Name', value: 'id' },
+								},
+							},
+						],
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<
+	DeleteDayAvailabilityMutation,
+	DeleteDayAvailabilityMutationVariables
+>;
 export const UpdateDayAvailabilityDocument = {
 	kind: 'Document',
 	definitions: [
@@ -981,6 +1052,133 @@ export const GetMeDocument = {
 		},
 	],
 } as unknown as DocumentNode<GetMeQuery, GetMeQueryVariables>;
+export const MyDailyAvailabilityDocument = {
+	kind: 'Document',
+	definitions: [
+		{
+			kind: 'OperationDefinition',
+			operation: 'query',
+			name: { kind: 'Name', value: 'myDailyAvailability' },
+			variableDefinitions: [
+				{
+					kind: 'VariableDefinition',
+					variable: {
+						kind: 'Variable',
+						name: { kind: 'Name', value: 'pagination' },
+					},
+					type: {
+						kind: 'NamedType',
+						name: { kind: 'Name', value: 'PaginationInput' },
+					},
+				},
+				{
+					kind: 'VariableDefinition',
+					variable: {
+						kind: 'Variable',
+						name: { kind: 'Name', value: 'input' },
+					},
+					type: {
+						kind: 'NonNullType',
+						type: {
+							kind: 'NamedType',
+							name: { kind: 'Name', value: 'MonthInput' },
+						},
+					},
+				},
+			],
+			selectionSet: {
+				kind: 'SelectionSet',
+				selections: [
+					{
+						kind: 'Field',
+						name: { kind: 'Name', value: 'myDailyAvailability' },
+						arguments: [
+							{
+								kind: 'Argument',
+								name: { kind: 'Name', value: 'pagination' },
+								value: {
+									kind: 'Variable',
+									name: { kind: 'Name', value: 'pagination' },
+								},
+							},
+							{
+								kind: 'Argument',
+								name: { kind: 'Name', value: 'input' },
+								value: {
+									kind: 'Variable',
+									name: { kind: 'Name', value: 'input' },
+								},
+							},
+						],
+						selectionSet: {
+							kind: 'SelectionSet',
+							selections: [
+								{
+									kind: 'Field',
+									name: { kind: 'Name', value: 'pageInfo' },
+									selectionSet: {
+										kind: 'SelectionSet',
+										selections: [
+											{ kind: 'Field', name: { kind: 'Name', value: 'page' } },
+											{ kind: 'Field', name: { kind: 'Name', value: 'pages' } },
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'totalResults' },
+											},
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'hasNext' },
+											},
+										],
+									},
+								},
+								{
+									kind: 'Field',
+									name: { kind: 'Name', value: 'edges' },
+									selectionSet: {
+										kind: 'SelectionSet',
+										selections: [
+											{ kind: 'Field', name: { kind: 'Name', value: 'id' } },
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'resource' },
+												selectionSet: {
+													kind: 'SelectionSet',
+													selections: [
+														{
+															kind: 'Field',
+															name: { kind: 'Name', value: 'name' },
+														},
+														{
+															kind: 'Field',
+															name: { kind: 'Name', value: 'description' },
+														},
+													],
+												},
+											},
+											{ kind: 'Field', name: { kind: 'Name', value: 'day' } },
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'startTime' },
+											},
+											{
+												kind: 'Field',
+												name: { kind: 'Name', value: 'endTime' },
+											},
+										],
+									},
+								},
+							],
+						},
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<
+	MyDailyAvailabilityQuery,
+	MyDailyAvailabilityQueryVariables
+>;
 export const MyResourcesDocument = {
 	kind: 'Document',
 	definitions: [
