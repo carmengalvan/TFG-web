@@ -1,9 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
-import { addDays, isSameDay, isWithinInterval } from 'date-fns';
+import { PAGE_SIZE } from '@/globals/constants';
+import { useMyDayAvailability } from '@/graphql/hooks/myDayAvailability/useMyDayAvailability';
+import { isSameDay, isWithinInterval } from 'date-fns';
+import { set } from 'lodash';
 import { PlusCircle, X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
 interface CalendarSelectProps {
@@ -18,8 +21,10 @@ export const CalendarSelect = ({
 	date,
 }: CalendarSelectProps) => {
 	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
+	const [selectedDate, setSelectedDate] = useState<Date>();
 
 	const handleDayClick = (day: Date) => {
+		setSelectedDate(day);
 		if (
 			(startDate &&
 				endDate &&
@@ -42,6 +47,23 @@ export const CalendarSelect = ({
 	const sortedSelectedDays = selectedDays
 		.slice()
 		.sort((a, b) => a.getTime() - b.getTime());
+
+	const myDayAvailability = useMyDayAvailability({
+		input: {
+			month: selectedDate ? selectedDate.getMonth() + 1 : 1,
+			year: selectedDate?.getFullYear() ?? 2024,
+		},
+		pagination: {
+			page: 1,
+			pageSize: PAGE_SIZE,
+		},
+	});
+
+	const selectedDayAvailability =
+		myDayAvailability.dailyAvailability.edges.find(
+			(availability) =>
+				selectedDate && isSameDay(availability.day, selectedDate)
+		);
 
 	return (
 		<>
@@ -68,9 +90,16 @@ export const CalendarSelect = ({
 									key={day.getTime()}
 								>
 									{day.toLocaleDateString()}
-									<Input className="ml-5" type="time" />
+									<Input
+										className="ml-5"
+										type="time"
+										defaultValue={selectedDayAvailability?.startTime}
+									/>
 									<p className="mx-2"> - </p>
-									<Input type="time" />
+									<Input
+										type="time"
+										defaultValue={selectedDayAvailability?.endTime}
+									/>
 									<X />
 									<PlusCircle />
 								</li>
