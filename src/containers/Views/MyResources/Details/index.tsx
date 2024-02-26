@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/select';
 import { CalendarSelect } from '@/containers/Layout/CalendarSelect';
 import { CheckboxReactHookFormMultiple } from '@/containers/Layout/CheckboxReactHookFormMultiple';
+import { CheckboxReactHookFormMultiple2 } from '@/containers/Layout/CheckboxReactHookFormMultiple2';
 import { useResourceActions } from '@/graphql/hooks/myResources/useResourceActions';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -59,6 +60,13 @@ export function MyResourcesDetailsView() {
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			available_time: 30,
+			description: 'Prueba',
+			location: 'Sevilla',
+			name: 'Recurso prueba',
+			time_measurement: 'minutes',
+		},
 	});
 
 	const { createResource } = useResourceActions();
@@ -72,8 +80,6 @@ export function MyResourcesDetailsView() {
 	};
 
 	const [resourceId, setResourceId] = useState<string>('');
-	const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		if (data.time_measurement === 'hours') {
@@ -93,8 +99,6 @@ export function MyResourcesDetailsView() {
 			});
 			if (response?.id) {
 				setResourceId(response.id);
-				setStartDate(date?.from);
-				setEndDate(date?.to);
 				setShowCheckbox(true);
 			}
 		} catch (e) {
@@ -116,12 +120,8 @@ export function MyResourcesDetailsView() {
 						</div>
 						<div className="w-full">
 							<Header title="Crear nuevo recurso" />
-							{date && startDate && endDate && (
-								<CalendarSelect
-									date={date}
-									startDate={startDate}
-									endDate={endDate}
-								/>
+							{date?.from && date?.to && (
+								<CalendarSelect date={{ from: date.from, to: date.to }} />
 							)}
 						</div>
 					</>
@@ -307,11 +307,11 @@ export function MyResourcesDetailsView() {
 						</div>
 						<div className="w-full">
 							<Header title="Crear nuevo recurso" />
-							{startDate && endDate && (
-								<CheckboxReactHookFormMultiple
+							{date?.from && date?.to && (
+								<CheckboxReactHookFormMultiple2
 									resourceId={resourceId}
-									startDate={startDate}
-									endDate={endDate}
+									startDate={date.from}
+									endDate={date.to}
 									onButtonClick={handleCheckboxButton}
 								/>
 							)}

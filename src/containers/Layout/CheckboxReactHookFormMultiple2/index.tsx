@@ -17,12 +17,19 @@ import {
 } from '../../../components/ui/form';
 import { Input } from '../../../components/ui/input';
 import { useConnect } from './connect';
-import { weekdays } from './constants';
 
 const FormSchema = z.object({
-	weekdays: z.array(z.string()).refine((value) => value.some((item) => item), {
-		message: 'You have to select at least one item.',
-	}),
+	weekdays: z
+		.array(
+			z.object({
+				id: z.string(),
+				label: z.string(),
+				checked: z.boolean(),
+			})
+		)
+		.refine((value) => value.some((item) => item), {
+			message: 'You have to select at least one item.',
+		}),
 });
 
 interface CheckboxReactHookFormMultipleProps {
@@ -32,7 +39,7 @@ interface CheckboxReactHookFormMultipleProps {
 	endDate: Date;
 }
 
-export const CheckboxReactHookFormMultiple = ({
+export const CheckboxReactHookFormMultiple2 = ({
 	onButtonClick,
 	resourceId,
 	startDate,
@@ -48,41 +55,28 @@ export const CheckboxReactHookFormMultiple = ({
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			weekdays: [
+				{
+					checked: false,
+					label: 'Lunes',
+					id: 'Monday',
+				},
+				{
+					checked: false,
+					label: 'Martes',
+					id: 'Tuesday',
+				},
+			],
+		},
 	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		try {
-			const days = getDaysBetweenDates(startDate, endDate, data.weekdays);
-			for (const day of days) {
-				const dayOfWeek = getDayOfWeek(day);
-				for (const timeSlot of timeSlots[dayOfWeek]) {
-					const response = await createDayAvailability({
-						resourceId: resourceId,
-						input: {
-							day: day,
-							startTime: timeSlot[0],
-							endTime: timeSlot[1],
-						},
-					});
-				}
-			}
-			onButtonClick();
-		} catch (error) {
-			console.error(error);
-		}
+		console.log(data);
 	}
 
-	const [selectedItems, setSelectedItems] = useState<string[]>([]);
-
-	console.log(selectedItems);
-
-	useEffect(() => {
-		form.setValue('weekdays', selectedItems);
-	}, [form.setValue, selectedItems]);
-
-	// const weekdays = form.getValues().weekdays;
-
-	console.log({ selectedItems, timeSlots });
+	const weekdays = form.watch('weekdays');
+	console.log('Weekdays', weekdays);
 
 	return (
 		<Form {...form}>
@@ -114,12 +108,19 @@ export const CheckboxReactHookFormMultiple = ({
 								>
 									<FormControl>
 										<Checkbox
-											checked={selectedItems.includes(item.id)}
-											onCheckedChange={(checked) => {
-												setSelectedItems((prevSelectedItems) =>
-													checked
-														? [...prevSelectedItems, item.id]
-														: prevSelectedItems.filter((id) => id !== item.id)
+											checked={item.checked}
+											onCheckedChange={() => {
+												form.setValue(
+													'weekdays',
+													weekdays.map((day) => {
+														if (day.id === item.id) {
+															return {
+																...day,
+																checked: !day.checked,
+															};
+														}
+														return day;
+													})
 												);
 											}}
 										/>
@@ -127,7 +128,7 @@ export const CheckboxReactHookFormMultiple = ({
 									<FormLabel className="font-normal text-lg">
 										{item.label}
 									</FormLabel>
-									{selectedItems.includes(item.id) ? (
+									{item.checked ? (
 										<>
 											<div className="flex flex-col">
 												{timeSlots[item.id]?.map((timeSlot, slotIndex) => (

@@ -4,24 +4,25 @@ import { Input } from '@/components/ui/input';
 import { PAGE_SIZE } from '@/globals/constants';
 import { useMyDayAvailability } from '@/graphql/hooks/myDayAvailability/useMyDayAvailability';
 import { isSameDay, isWithinInterval } from 'date-fns';
-import { set } from 'lodash';
 import { PlusCircle, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
 interface CalendarSelectProps {
-	startDate: Date;
-	endDate: Date;
-	date: DateRange;
+	date: {
+		from: Date;
+		to: Date;
+	};
 }
 
-export const CalendarSelect = ({
-	startDate,
-	endDate,
-	date,
-}: CalendarSelectProps) => {
+export const CalendarSelect = ({ date }: CalendarSelectProps) => {
 	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
 	const [selectedDate, setSelectedDate] = useState<Date>();
+	const startDate = date.from;
+	const endDate = date.to;
+
+	const [startTime, setStartTime] = useState<string | undefined>();
+	const [endTime, setEndTime] = useState<string | undefined>();
 
 	const handleDayClick = (day: Date) => {
 		setSelectedDate(day);
@@ -42,6 +43,8 @@ export const CalendarSelect = ({
 			} else {
 				setSelectedDays((prevSelectedDays) => [...prevSelectedDays, day]);
 			}
+			setStartTime(selectedDayAvailability?.startTime);
+			setEndTime(selectedDayAvailability?.endTime);
 		}
 	};
 	const sortedSelectedDays = selectedDays
