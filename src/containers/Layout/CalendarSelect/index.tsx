@@ -5,8 +5,7 @@ import { PAGE_SIZE } from '@/globals/constants';
 import { useMyDayAvailability } from '@/graphql/hooks/myDayAvailability/useMyDayAvailability';
 import { isSameDay, isWithinInterval } from 'date-fns';
 import { PlusCircle, X } from 'lucide-react';
-import React, { useState } from 'react';
-import { DateRange } from 'react-day-picker';
+import React, { useEffect, useState } from 'react';
 
 interface CalendarSelectProps {
 	date: {
@@ -15,17 +14,22 @@ interface CalendarSelectProps {
 	};
 }
 
+type SelectedDay = {
+	date: Date;
+	timeRange: {
+		startTime: string;
+		endTime: string;
+	}[];
+};
+
 export const CalendarSelect = ({ date }: CalendarSelectProps) => {
-	const [selectedDays, setSelectedDays] = useState<Date[]>([]);
-	const [selectedDate, setSelectedDate] = useState<Date>();
+	const [selectedDays, setSelectedDays] = useState<SelectedDay[]>([]);
 	const startDate = date.from;
 	const endDate = date.to;
 
-	const [startTime, setStartTime] = useState<string | undefined>();
-	const [endTime, setEndTime] = useState<string | undefined>();
+	const { getDaysAvailabilities } = useMyDayAvailability();
 
-	const handleDayClick = (day: Date) => {
-		setSelectedDate(day);
+	const handleDayClick = async (day: Date) => {
 		if (
 			(startDate &&
 				endDate &&
@@ -33,40 +37,52 @@ export const CalendarSelect = ({ date }: CalendarSelectProps) => {
 			isSameDay(day, startDate)
 		) {
 			const isAlreadySelected = selectedDays.some((selectedDay) =>
-				isSameDay(selectedDay, day)
+				isSameDay(selectedDay.date, day)
 			);
 
 			if (isAlreadySelected) {
 				setSelectedDays((prevSelectedDays) =>
-					prevSelectedDays.filter((selectedDay) => !isSameDay(selectedDay, day))
+					prevSelectedDays.filter(
+						(selectedDay) => !isSameDay(selectedDay.date, day)
+					)
 				);
 			} else {
-				setSelectedDays((prevSelectedDays) => [...prevSelectedDays, day]);
+				const myDayAvailability = await getDaysAvailabilities({
+					variables: {
+						input: {
+							month: day.getMonth() + 1,
+							year: day.getFullYear(),
+						},
+						pagination: {
+							page: 1,
+							pageSize: PAGE_SIZE,
+						},
+					},
+				});
+				const selectedDayAvailability =
+					myDayAvailability.data?.myDailyAvailability.edges.find(
+						(availability) => day && isSameDay(availability.day, day)
+					);
+
+				const newSelectedDay: SelectedDay = {
+					date: day,
+					timeRange: [
+						{
+							startTime: selectedDayAvailability?.startTime ?? '',
+							endTime: selectedDayAvailability?.endTime ?? '',
+						},
+					],
+				};
+				setSelectedDays((prevSelectedDays) => [
+					...prevSelectedDays,
+					newSelectedDay,
+				]);
 			}
-			setStartTime(selectedDayAvailability?.startTime);
-			setEndTime(selectedDayAvailability?.endTime);
 		}
 	};
 	const sortedSelectedDays = selectedDays
 		.slice()
-		.sort((a, b) => a.getTime() - b.getTime());
-
-	const myDayAvailability = useMyDayAvailability({
-		input: {
-			month: selectedDate ? selectedDate.getMonth() + 1 : 1,
-			year: selectedDate?.getFullYear() ?? 2024,
-		},
-		pagination: {
-			page: 1,
-			pageSize: PAGE_SIZE,
-		},
-	});
-
-	const selectedDayAvailability =
-		myDayAvailability.dailyAvailability.edges.find(
-			(availability) =>
-				selectedDate && isSameDay(availability.day, selectedDate)
-		);
+		.sort((a, b) => a.date.getTime() - b.date.getTime());
 
 	return (
 		<>
@@ -90,18 +106,18 @@ export const CalendarSelect = ({ date }: CalendarSelectProps) => {
 							{sortedSelectedDays.map((day) => (
 								<li
 									className="mt-2 flex items-center space-x-2"
-									key={day.getTime()}
+									key={day?.date?.getTime()}
 								>
-									{day.toLocaleDateString()}
+									{day?.date?.toLocaleDateString()}
 									<Input
 										className="ml-5"
 										type="time"
-										defaultValue={selectedDayAvailability?.startTime}
+										defaultValue={day?.timeRange?.[0].startTime}
 									/>
 									<p className="mx-2"> - </p>
 									<Input
 										type="time"
-										defaultValue={selectedDayAvailability?.endTime}
+										defaultValue={day?.timeRange?.[0].endTime}
 									/>
 									<X />
 									<PlusCircle />

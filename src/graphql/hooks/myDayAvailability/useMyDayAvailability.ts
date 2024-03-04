@@ -1,45 +1,17 @@
 import {
-	MonthInput,
 	MyDailyAvailabilityDocument,
 	MyDailyAvailabilityQuery,
 	MyDailyAvailabilityQueryVariables,
-	PaginationInput,
 } from '@/graphql/generated/types';
-import { FetchPolicy, useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 
-export const useMyDayAvailability = ({
-	input,
-	pagination,
-}: {
-	input?: MonthInput;
-	pagination?: PaginationInput;
-	fetchPolicy?: FetchPolicy;
-	pollInterval?: number;
-}) => {
-	const { data } = useQuery<
+export const useMyDayAvailability = () => {
+	const [getDaysAvailabilities] = useLazyQuery<
 		MyDailyAvailabilityQuery,
 		MyDailyAvailabilityQueryVariables
-	>(MyDailyAvailabilityDocument, {
-		variables: {
-			input: {
-				month: input?.month || 1,
-				year: input?.year || 2024,
-			},
-			pagination: {
-				...pagination,
-			},
-		},
-	});
-
-	const dailyAvailability = data?.myDailyAvailability.edges ?? [];
+	>(MyDailyAvailabilityDocument);
 
 	return {
-		dailyAvailability: {
-			edges: dailyAvailability.filter(
-				({ id }, index, self) =>
-					index === self.findIndex(({ id: findId }) => findId === id)
-			),
-			pageInfo: data?.myDailyAvailability.pageInfo,
-		},
+		getDaysAvailabilities,
 	};
 };
