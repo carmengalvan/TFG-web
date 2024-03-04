@@ -26,7 +26,6 @@ import {
 } from '@/components/ui/select';
 import { CalendarSelect } from '@/containers/Layout/CalendarSelect';
 import { CheckboxReactHookFormMultiple } from '@/containers/Layout/CheckboxReactHookFormMultiple';
-import { CheckboxReactHookFormMultiple2 } from '@/containers/Layout/CheckboxReactHookFormMultiple2';
 import { useResourceActions } from '@/graphql/hooks/myResources/useResourceActions';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -308,7 +307,7 @@ export function MyResourcesDetailsView() {
 						<div className="w-full">
 							<Header title="Crear nuevo recurso" />
 							{date?.from && date?.to && (
-								<CheckboxReactHookFormMultiple2
+								<CheckboxReactHookFormMultiple
 									resourceId={resourceId}
 									startDate={date.from}
 									endDate={date.to}
