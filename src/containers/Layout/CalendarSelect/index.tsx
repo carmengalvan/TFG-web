@@ -5,7 +5,7 @@ import { PAGE_SIZE } from '@/globals/constants';
 import { useMyDayAvailability } from '@/graphql/hooks/myDayAvailability/useMyDayAvailability';
 import { isSameDay, isWithinInterval } from 'date-fns';
 import { PlusCircle, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface CalendarSelectProps {
 	date: {
@@ -29,6 +29,37 @@ export const CalendarSelect = ({ date }: CalendarSelectProps) => {
 
 	const { getDaysAvailabilities } = useMyDayAvailability();
 
+	const getNewSelectedDay = async (day: Date): Promise<SelectedDay> => {
+		const myDayAvailability = await getDaysAvailabilities({
+			variables: {
+				input: {
+					month: day.getMonth() + 1,
+					year: day.getFullYear(),
+				},
+				pagination: {
+					page: 1,
+					pageSize: PAGE_SIZE,
+				},
+			},
+		});
+
+		console.log(myDayAvailability);
+		const selectedDayAvailability =
+			myDayAvailability.data?.myDailyAvailability.edges.find(
+				(availability) => day && isSameDay(availability.day, day)
+			);
+
+		return {
+			date: day,
+			timeRange: [
+				{
+					startTime: selectedDayAvailability?.startTime ?? '',
+					endTime: selectedDayAvailability?.endTime ?? '',
+				},
+			],
+		};
+	};
+
 	const handleDayClick = async (day: Date) => {
 		if (
 			(startDate &&
@@ -47,32 +78,7 @@ export const CalendarSelect = ({ date }: CalendarSelectProps) => {
 					)
 				);
 			} else {
-				const myDayAvailability = await getDaysAvailabilities({
-					variables: {
-						input: {
-							month: day.getMonth() + 1,
-							year: day.getFullYear(),
-						},
-						pagination: {
-							page: 1,
-							pageSize: PAGE_SIZE,
-						},
-					},
-				});
-				const selectedDayAvailability =
-					myDayAvailability.data?.myDailyAvailability.edges.find(
-						(availability) => day && isSameDay(availability.day, day)
-					);
-
-				const newSelectedDay: SelectedDay = {
-					date: day,
-					timeRange: [
-						{
-							startTime: selectedDayAvailability?.startTime ?? '',
-							endTime: selectedDayAvailability?.endTime ?? '',
-						},
-					],
-				};
+				const newSelectedDay = await getNewSelectedDay(day);
 				setSelectedDays((prevSelectedDays) => [
 					...prevSelectedDays,
 					newSelectedDay,
