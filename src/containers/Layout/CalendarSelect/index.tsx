@@ -41,9 +41,9 @@ export const CalendarSelect = ({ date }: CalendarSelectProps) => {
 					pageSize: PAGE_SIZE,
 				},
 			},
+			fetchPolicy: 'cache-and-network',
 		});
 
-		console.log(myDayAvailability);
 		const selectedDayAvailability =
 			myDayAvailability.data?.myDailyAvailability.edges.find(
 				(availability) => day && isSameDay(availability.day, day)
