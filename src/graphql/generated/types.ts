@@ -38,6 +38,11 @@ export type ChangePasswordInput = {
 	repeatPassword?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type DayAvailabilityGroupType = {
+	availabilities: Array<DayAvailabilityType>;
+	day: Scalars['Date']['output'];
+};
+
 export type DayAvailabilityInput = {
 	day: Scalars['Date']['input'];
 	endTime: Scalars['Time']['input'];
@@ -158,11 +163,6 @@ export type PageInfoType = {
 	totalResults: Scalars['Int']['output'];
 };
 
-export type PaginatedDayAvailabilityType = {
-	edges: Array<DayAvailabilityType>;
-	pageInfo: PageInfoType;
-};
-
 export type PaginatedResourceType = {
 	edges: Array<ResourceType>;
 	pageInfo: PageInfoType;
@@ -181,14 +181,13 @@ export type ProfileInput = {
 export type Query = {
 	me: UserType;
 	/** Returns a list of your daily availabilities. */
-	myDailyAvailability: PaginatedDayAvailabilityType;
+	myDailyAvailability: Array<DayAvailabilityGroupType>;
 	/** Returns a list of your resources. */
 	myResources: PaginatedResourceType;
 };
 
 export type QueryMyDailyAvailabilityArgs = {
 	input: MonthInput;
-	pagination?: InputMaybe<PaginationInput>;
 };
 
 export type QueryMyResourcesArgs = {
@@ -409,26 +408,19 @@ export type GetMeQuery = {
 };
 
 export type MyDailyAvailabilityQueryVariables = Exact<{
-	pagination?: InputMaybe<PaginationInput>;
 	input: MonthInput;
 }>;
 
 export type MyDailyAvailabilityQuery = {
-	myDailyAvailability: {
-		pageInfo: {
-			page: number;
-			pages: number;
-			totalResults: number;
-			hasNext: boolean;
-		};
-		edges: Array<{
+	myDailyAvailability: Array<{
+		day: string;
+		availabilities: Array<{
 			id: string;
-			day: string;
 			startTime: string;
 			endTime: string;
-			resource: { name: string; description: string };
+			resource: { name: string };
 		}>;
-	};
+	}>;
 };
 
 export type MyResourcesQueryVariables = Exact<{
@@ -1064,17 +1056,6 @@ export const MyDailyAvailabilityDocument = {
 					kind: 'VariableDefinition',
 					variable: {
 						kind: 'Variable',
-						name: { kind: 'Name', value: 'pagination' },
-					},
-					type: {
-						kind: 'NamedType',
-						name: { kind: 'Name', value: 'PaginationInput' },
-					},
-				},
-				{
-					kind: 'VariableDefinition',
-					variable: {
-						kind: 'Variable',
 						name: { kind: 'Name', value: 'input' },
 					},
 					type: {
@@ -1095,14 +1076,6 @@ export const MyDailyAvailabilityDocument = {
 						arguments: [
 							{
 								kind: 'Argument',
-								name: { kind: 'Name', value: 'pagination' },
-								value: {
-									kind: 'Variable',
-									name: { kind: 'Name', value: 'pagination' },
-								},
-							},
-							{
-								kind: 'Argument',
 								name: { kind: 'Name', value: 'input' },
 								value: {
 									kind: 'Variable',
@@ -1113,28 +1086,10 @@ export const MyDailyAvailabilityDocument = {
 						selectionSet: {
 							kind: 'SelectionSet',
 							selections: [
+								{ kind: 'Field', name: { kind: 'Name', value: 'day' } },
 								{
 									kind: 'Field',
-									name: { kind: 'Name', value: 'pageInfo' },
-									selectionSet: {
-										kind: 'SelectionSet',
-										selections: [
-											{ kind: 'Field', name: { kind: 'Name', value: 'page' } },
-											{ kind: 'Field', name: { kind: 'Name', value: 'pages' } },
-											{
-												kind: 'Field',
-												name: { kind: 'Name', value: 'totalResults' },
-											},
-											{
-												kind: 'Field',
-												name: { kind: 'Name', value: 'hasNext' },
-											},
-										],
-									},
-								},
-								{
-									kind: 'Field',
-									name: { kind: 'Name', value: 'edges' },
+									name: { kind: 'Name', value: 'availabilities' },
 									selectionSet: {
 										kind: 'SelectionSet',
 										selections: [
@@ -1149,14 +1104,9 @@ export const MyDailyAvailabilityDocument = {
 															kind: 'Field',
 															name: { kind: 'Name', value: 'name' },
 														},
-														{
-															kind: 'Field',
-															name: { kind: 'Name', value: 'description' },
-														},
 													],
 												},
 											},
-											{ kind: 'Field', name: { kind: 'Name', value: 'day' } },
 											{
 												kind: 'Field',
 												name: { kind: 'Name', value: 'startTime' },

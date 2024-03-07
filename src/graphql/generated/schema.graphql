@@ -14,6 +14,11 @@ Date with time (isoformat)
 """
 scalar DateTime
 
+type DayAvailabilityGroupType {
+  availabilities: [DayAvailabilityType!]!
+  day: Date!
+}
+
 input DayAvailabilityInput {
   day: Date!
   endTime: Time!
@@ -104,11 +109,6 @@ type PageInfoType {
   totalResults: Int!
 }
 
-type PaginatedDayAvailabilityType {
-  edges: [DayAvailabilityType!]!
-  pageInfo: PageInfoType!
-}
-
 type PaginatedResourceType {
   edges: [ResourceType!]!
   pageInfo: PageInfoType!
@@ -130,10 +130,7 @@ type Query {
   """
   Returns a list of your daily availabilities.
   """
-  myDailyAvailability(
-    input: MonthInput!
-    pagination: PaginationInput = null
-  ): PaginatedDayAvailabilityType!
+  myDailyAvailability(input: MonthInput!): [DayAvailabilityGroupType!]!
 
   """
   Returns a list of your resources.

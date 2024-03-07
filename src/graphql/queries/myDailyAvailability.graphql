@@ -1,24 +1,15 @@
 query myDailyAvailability(
-    $pagination: PaginationInput,
     $input: MonthInput!,
 ){
   myDailyAvailability(
-    pagination: $pagination,
     input: $input
   ){
-    pageInfo{
-      page
-      pages
-      totalResults
-      hasNext
-    }
-    edges{
+    day
+    availabilities{
       id
       resource{
         name
-        description
       }
-      day
       startTime
       endTime
     }

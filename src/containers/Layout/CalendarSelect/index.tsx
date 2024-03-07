@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
-import { PAGE_SIZE } from '@/globals/constants';
 import { useMyDayAvailability } from '@/graphql/hooks/myDayAvailability/useMyDayAvailability';
 import { isSameDay, isWithinInterval } from 'date-fns';
 import { PlusCircle, X } from 'lucide-react';
@@ -16,7 +15,7 @@ interface CalendarSelectProps {
 
 type SelectedDay = {
 	date: Date;
-	timeRange: {
+	timeRange?: {
 		startTime: string;
 		endTime: string;
 	}[];
@@ -36,27 +35,21 @@ export const CalendarSelect = ({ date }: CalendarSelectProps) => {
 					month: day.getMonth() + 1,
 					year: day.getFullYear(),
 				},
-				pagination: {
-					page: 1,
-					pageSize: PAGE_SIZE,
-				},
 			},
 			fetchPolicy: 'cache-and-network',
 		});
 
 		const selectedDayAvailability =
-			myDayAvailability.data?.myDailyAvailability.edges.find(
+			myDayAvailability.data?.myDailyAvailability.find(
 				(availability) => day && isSameDay(availability.day, day)
 			);
 
 		return {
 			date: day,
-			timeRange: [
-				{
-					startTime: selectedDayAvailability?.startTime ?? '',
-					endTime: selectedDayAvailability?.endTime ?? '',
-				},
-			],
+			timeRange: selectedDayAvailability?.availabilities.map((avail) => ({
+				startTime: avail.startTime,
+				endTime: avail.endTime,
+			})),
 		};
 	};
 
@@ -111,21 +104,24 @@ export const CalendarSelect = ({ date }: CalendarSelectProps) => {
 						<ul className="mt-2">
 							{sortedSelectedDays.map((day) => (
 								<li
-									className="mt-2 flex items-center space-x-2"
+									className="mt-2 flex items-center"
 									key={day?.date?.getTime()}
 								>
-									{day?.date?.toLocaleDateString()}
-									<Input
-										className="ml-5"
-										type="time"
-										defaultValue={day?.timeRange?.[0].startTime}
-									/>
-									<p className="mx-2"> - </p>
-									<Input
-										type="time"
-										defaultValue={day?.timeRange?.[0].endTime}
-									/>
-									<X />
+									<div className="flex flex-col">
+										<p>{day?.date?.toLocaleDateString()}</p>
+										{day.timeRange?.map((timeRange, index) => (
+											<div
+												// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+												key={index}
+												className="flex items-center space-x-2 mt-2"
+											>
+												<Input type="time" defaultValue={timeRange.startTime} />
+												<p className="mx-2"> - </p>
+												<Input type="time" defaultValue={timeRange.endTime} />
+												<X />
+											</div>
+										))}
+									</div>
 									<PlusCircle />
 								</li>
 							))}
