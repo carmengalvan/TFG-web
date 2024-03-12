@@ -133,18 +133,14 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 		}
 	}
 
-	const handleRemoveSlots = async (
-		dayDate: Date,
-		timeRangeId: string,
-		index: number
-	) => {
+	const handleRemoveSlots = async (dayDate: Date, timeRangeId: string) => {
 		console.log(timeRangeId);
 		await deleteDayAvailability(timeRangeId);
 
 		const updatedSelectedDays = selectedDays.map((selectedDay) => {
 			if (isSameDay(selectedDay.date, dayDate)) {
 				const updatedTimeRange = selectedDay.timeRange?.filter(
-					(_, i: number) => i !== index
+					(timeRange) => timeRangeId !== timeRange.id
 				);
 				return {
 					...selectedDay,
@@ -197,8 +193,7 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 																<p>{day?.date?.toLocaleDateString()}</p>
 																{day.timeRange?.map((timeRange, index) => (
 																	<div
-																		// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-																		key={index}
+																		key={timeRange.id}
 																		className="flex items-center space-x-2 mt-2"
 																	>
 																		<FormItem>
@@ -238,8 +233,7 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 																			onClick={() =>
 																				handleRemoveSlots(
 																					day.date,
-																					timeRange.id,
-																					index
+																					timeRange.id
 																				)
 																			}
 																		/>
