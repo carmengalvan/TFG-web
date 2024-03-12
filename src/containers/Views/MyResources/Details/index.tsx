@@ -120,7 +120,10 @@ export function MyResourcesDetailsView() {
 						<div className="w-full">
 							<Header title="Crear nuevo recurso" />
 							{date?.from && date?.to && (
-								<CalendarSelect date={{ from: date.from, to: date.to }} />
+								<CalendarSelect
+									resourceId={resourceId}
+									date={{ from: date.from, to: date.to }}
+								/>
 							)}
 						</div>
 					</>

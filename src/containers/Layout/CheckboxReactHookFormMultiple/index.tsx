@@ -5,7 +5,6 @@ import {
 } from '@/utils/getDaysBetweenDates';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PlusCircle, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '../../../components/ui/button';

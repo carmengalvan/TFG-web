@@ -76,6 +76,7 @@ export type MediaUploadUrlType = {
 
 export type MonthInput = {
 	month: Scalars['Int']['input'];
+	resourceId: Scalars['UUID']['input'];
 	year: Scalars['Int']['input'];
 };
 

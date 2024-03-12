@@ -52,6 +52,7 @@ type MediaUploadUrlType {
 
 input MonthInput {
   month: Int!
+  resourceId: UUID!
   year: Int!
 }
 
