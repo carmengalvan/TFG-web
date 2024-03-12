@@ -2,10 +2,12 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { paths } from '@/globals/paths';
 import { useDayAvailabilityActions } from '@/graphql/hooks/myDayAvailability/useDayAvailabilityActions';
 import { useMyDayAvailability } from '@/graphql/hooks/myDayAvailability/useMyDayAvailability';
 import { isSameDay, isWithinInterval } from 'date-fns';
 import { PlusCircle, X } from 'lucide-react';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -24,7 +26,8 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 	const endDate = date.to;
 
 	const { getDaysAvailabilities } = useMyDayAvailability();
-	const { updateDayAvailability } = useDayAvailabilityActions();
+	const { deleteDayAvailability, updateDayAvailability } =
+		useDayAvailabilityActions();
 
 	const handleInputChange = (
 		date: Date,
@@ -112,6 +115,7 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 		.slice()
 		.sort((a, b) => a.date.getTime() - b.date.getTime());
 
+	const { push } = useRouter();
 	async function onSubmit() {
 		try {
 			for (const day of sortedSelectedDays.flat()) {
@@ -123,10 +127,34 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 					});
 				}
 			}
+			await push(paths.public.home);
 		} catch (error) {
 			console.error(error);
 		}
 	}
+
+	const handleRemoveSlots = async (
+		dayDate: Date,
+		timeRangeId: string,
+		index: number
+	) => {
+		console.log(timeRangeId);
+		await deleteDayAvailability(timeRangeId);
+
+		const updatedSelectedDays = selectedDays.map((selectedDay) => {
+			if (isSameDay(selectedDay.date, dayDate)) {
+				const updatedTimeRange = selectedDay.timeRange?.filter(
+					(_, i: number) => i !== index
+				);
+				return {
+					...selectedDay,
+					timeRange: updatedTimeRange,
+				};
+			}
+			return selectedDay;
+		});
+		setSelectedDays(updatedSelectedDays);
+	};
 
 	return (
 		<Form {...form}>
@@ -206,7 +234,15 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 																				/>
 																			</FormControl>
 																		</FormItem>
-																		<X />
+																		<X
+																			onClick={() =>
+																				handleRemoveSlots(
+																					day.date,
+																					timeRange.id,
+																					index
+																				)
+																			}
+																		/>
 																	</div>
 																))}
 															</div>
