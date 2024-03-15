@@ -13,7 +13,6 @@ export const useConnect = (
 	) => {
 		setSelectedDays((prevSelectedDays) => {
 			return prevSelectedDays.map((selectedDay) => {
-				console.log('SelectedDay', selectedDay);
 				if (isSameDay(selectedDay.date, dayDate)) {
 					const updatedTimeRange = selectedDay.timeRange
 						? selectedDay.timeRange.map((timeRange) => {

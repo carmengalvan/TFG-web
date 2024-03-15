@@ -6,6 +6,7 @@ import { paths } from '@/globals/paths';
 import { useDayAvailabilityActions } from '@/graphql/hooks/myDayAvailability/useDayAvailabilityActions';
 import { useMyDayAvailability } from '@/graphql/hooks/myDayAvailability/useMyDayAvailability';
 import { formatDate } from '@/utils/formatDate';
+import { isGraphqlMessageError } from '@/utils/isGraphqlMessageError';
 import { isSameDay, isWithinInterval } from 'date-fns';
 import { PlusCircle, X } from 'lucide-react';
 import { useRouter } from 'next/router';
@@ -27,6 +28,7 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 	const [selectedDays, setSelectedDays] = useState<SelectedDay[]>([]);
 	const startDate = date.from;
 	const endDate = date.to;
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const { handleNewTime, handleRemoveEmptySlots, handleInputChange } =
 		useConnect(setSelectedDays, selectedDays);
@@ -93,7 +95,7 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 		}
 	};
 
-	function handleAddTimeSlot(dayDate: Date) {
+	const handleAddTimeSlot = (dayDate: Date) => {
 		const updatedSelectedDays = selectedDays.map((selectedDay) => {
 			if (isSameDay(selectedDay.date, dayDate)) {
 				const newTimeRange = {
@@ -115,7 +117,7 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 		});
 
 		setSelectedDays(updatedSelectedDays);
-	}
+	};
 
 	const handleRemoveSlots = async (dayDate: Date, timeRangeId: string) => {
 		if (timeRangeId) {
@@ -145,17 +147,15 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 	async function onSubmit() {
 		try {
 			for (const day of sortedSelectedDays) {
-				for (const timeRange of day.timeRange ?? []) {
-					if (!timeRange.baseId) {
-						await createDayAvailability({
-							resourceId: resourceId,
-							input: {
-								day: formatDate(day.date),
-								startTime: timeRange.startTime,
-								endTime: timeRange.endTime,
-							},
-						});
-					} else {
+				//.reverse is so that there is no error when updating two incompatible time slots in the backend
+				const timeRangeToUpdate = day.timeRange
+					?.filter((timeRange) => !!timeRange.baseId)
+					.reverse();
+				const timeRangeToCreate = day.timeRange
+					?.filter((timeRange) => !timeRange.baseId)
+					.reverse();
+				for (const timeRange of timeRangeToUpdate ?? []) {
+					if (timeRange.baseId) {
 						await updateDayAvailability({
 							dayAvailabilityId: timeRange.baseId,
 							startTime: timeRange.startTime,
@@ -163,10 +163,22 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 						});
 					}
 				}
+				for (const timeRange of timeRangeToCreate ?? []) {
+					await createDayAvailability({
+						resourceId: resourceId,
+						input: {
+							day: formatDate(day.date),
+							startTime: timeRange.startTime,
+							endTime: timeRange.endTime,
+						},
+					});
+				}
 			}
 			await push(paths.public.home);
 		} catch (error) {
-			console.error(error);
+			if (isGraphqlMessageError(error)) {
+				setErrorMessage(error.message);
+			}
 		}
 	}
 
@@ -299,6 +311,11 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 				</div>
 				<div className="mt-10 mb-5 ml-32">
 					<Button type="submit">Guardar</Button>
+					{errorMessage && (
+						<p className="mt-5 text-red-600">
+							Por favor, ordene los horarios cronológicamente
+						</p>
+					)}
 				</div>
 			</form>
 		</Form>

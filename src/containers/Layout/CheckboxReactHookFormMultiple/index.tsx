@@ -3,8 +3,10 @@ import {
 	getDayOfWeek,
 	getDaysBetweenDates,
 } from '@/utils/getDaysBetweenDates';
+import { isGraphqlMessageError } from '@/utils/isGraphqlMessageError';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PlusCircle, X } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '../../../components/ui/button';
@@ -50,6 +52,8 @@ export const CheckboxReactHookFormMultiple = ({
 	const { handleAddTimeSlot, handleRemoveTimeSlot, createDayAvailability } =
 		useConnect(form);
 
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		try {
 			const checkedDays = data.weekdays
@@ -77,7 +81,9 @@ export const CheckboxReactHookFormMultiple = ({
 			}
 			onButtonClick();
 		} catch (error) {
-			console.error(error);
+			if (isGraphqlMessageError(error)) {
+				setErrorMessage(error.message);
+			}
 		}
 	}
 
@@ -219,6 +225,7 @@ export const CheckboxReactHookFormMultiple = ({
 					)}
 				/>
 				<Button type="submit">Continuar</Button>
+				{errorMessage && <p className="mt-5 text-red-600">{errorMessage}</p>}
 			</form>
 		</Form>
 	);

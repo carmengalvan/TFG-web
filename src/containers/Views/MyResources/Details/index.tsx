@@ -28,9 +28,10 @@ import { CalendarSelect } from '@/containers/Layout/CalendarSelect';
 import { CheckboxReactHookFormMultiple } from '@/containers/Layout/CheckboxReactHookFormMultiple';
 import { useResourceActions } from '@/graphql/hooks/myResources/useResourceActions';
 import { cn } from '@/lib/utils';
+import { isGraphqlMessageError } from '@/utils/isGraphqlMessageError';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { addDays, format, isSameDay, isWithinInterval } from 'date-fns';
-import { CalendarIcon, PlusCircle, X } from 'lucide-react';
+import { addDays, format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useForm } from 'react-hook-form';
@@ -73,6 +74,8 @@ export function MyResourcesDetailsView() {
 
 	const [resourceId, setResourceId] = useState<string>('');
 
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		if (data.time_measurement === 'hours') {
 			data.available_time = data.available_time * 60;
@@ -94,7 +97,9 @@ export function MyResourcesDetailsView() {
 				setShowCheckbox(true);
 			}
 		} catch (e) {
-			console.error('Error en la solicitud al backend:', e);
+			if (isGraphqlMessageError(e)) {
+				setErrorMessage(e.message);
+			}
 		}
 	};
 
@@ -238,6 +243,11 @@ export function MyResourcesDetailsView() {
 
 										<div className="mt-10 mb-5">
 											<Button type="submit">Continuar</Button>
+											{errorMessage && (
+												<p className="mt-5 text-red-400">
+													Error: {errorMessage}
+												</p>
+											)}
 										</div>
 									</div>
 									<div className="w-2/5 ml-10">
