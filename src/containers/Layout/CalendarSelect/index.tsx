@@ -5,11 +5,14 @@ import { Input } from '@/components/ui/input';
 import { paths } from '@/globals/paths';
 import { useDayAvailabilityActions } from '@/graphql/hooks/myDayAvailability/useDayAvailabilityActions';
 import { useMyDayAvailability } from '@/graphql/hooks/myDayAvailability/useMyDayAvailability';
+import { formatDate } from '@/utils/formatDate';
 import { isSameDay, isWithinInterval } from 'date-fns';
 import { PlusCircle, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
+import { useConnect } from './connect';
 
 interface CalendarSelectProps {
 	resourceId: string;
@@ -25,38 +28,14 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 	const startDate = date.from;
 	const endDate = date.to;
 
-	const { getDaysAvailabilities } = useMyDayAvailability();
-	const { deleteDayAvailability, updateDayAvailability } =
-		useDayAvailabilityActions();
+	const { handleNewTime, handleInputChange } = useConnect(setSelectedDays);
 
-	const handleInputChange = (
-		date: Date,
-		id: string,
-		field: 'startTime' | 'endTime',
-		value: string
-	) => {
-		setSelectedDays((prevSelectedDays) => {
-			const updatedSelectedDays = prevSelectedDays.map((selectedDay) => {
-				if (isSameDay(selectedDay.date, date)) {
-					const updatedTimeRange = selectedDay.timeRange?.map((timeRange) => {
-						if (timeRange.id === id) {
-							return {
-								...timeRange,
-								[field]: value,
-							};
-						}
-						return timeRange;
-					});
-					return {
-						...selectedDay,
-						timeRange: updatedTimeRange,
-					};
-				}
-				return selectedDay;
-			});
-			return updatedSelectedDays;
-		});
-	};
+	const { getDaysAvailabilities } = useMyDayAvailability();
+	const {
+		createDayAvailability,
+		deleteDayAvailability,
+		updateDayAvailability,
+	} = useDayAvailabilityActions();
 
 	const getNewSelectedDay = async (day: Date): Promise<SelectedDay> => {
 		const myDayAvailability = await getDaysAvailabilities({
@@ -78,7 +57,8 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 		return {
 			date: day,
 			timeRange: selectedDayAvailability?.availabilities.map((avail) => ({
-				id: avail.id,
+				id: uuidv4(),
+				baseId: avail.id,
 				startTime: avail.startTime,
 				endTime: avail.endTime,
 			})),
@@ -111,31 +91,35 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 			}
 		}
 	};
-	const sortedSelectedDays = selectedDays
-		.slice()
-		.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-	const { push } = useRouter();
-	async function onSubmit() {
-		try {
-			for (const day of sortedSelectedDays.flat()) {
-				for (const timeRange of day.timeRange?.flat() ?? []) {
-					const response = await updateDayAvailability({
-						dayAvailabilityId: timeRange.id,
-						startTime: timeRange.startTime,
-						endTime: timeRange.endTime,
-					});
-				}
+	function handleAddTimeSlot(dayDate: Date) {
+		const updatedSelectedDays = selectedDays.map((selectedDay) => {
+			if (isSameDay(selectedDay.date, dayDate)) {
+				const newTimeRange = {
+					id: uuidv4(),
+					startTime: '',
+					endTime: '',
+				};
+				const updatedTimeRange = [
+					...(selectedDay.timeRange || []),
+					newTimeRange,
+				];
+
+				return {
+					...selectedDay,
+					timeRange: updatedTimeRange,
+				};
 			}
-			await push(paths.public.home);
-		} catch (error) {
-			console.error(error);
-		}
+			return selectedDay;
+		});
+
+		setSelectedDays(updatedSelectedDays);
 	}
 
 	const handleRemoveSlots = async (dayDate: Date, timeRangeId: string) => {
-		console.log(timeRangeId);
-		await deleteDayAvailability(timeRangeId);
+		if (timeRangeId) {
+			await deleteDayAvailability(timeRangeId);
+		}
 
 		const updatedSelectedDays = selectedDays.map((selectedDay) => {
 			if (isSameDay(selectedDay.date, dayDate)) {
@@ -151,6 +135,39 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 		});
 		setSelectedDays(updatedSelectedDays);
 	};
+
+	const sortedSelectedDays = selectedDays
+		.slice()
+		.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+	const { push } = useRouter();
+	async function onSubmit() {
+		try {
+			for (const day of sortedSelectedDays) {
+				for (const timeRange of day.timeRange ?? []) {
+					if (!timeRange.baseId) {
+						await createDayAvailability({
+							resourceId: resourceId,
+							input: {
+								day: formatDate(day.date),
+								startTime: timeRange.startTime,
+								endTime: timeRange.endTime,
+							},
+						});
+					} else {
+						await updateDayAvailability({
+							dayAvailabilityId: timeRange.baseId,
+							startTime: timeRange.startTime,
+							endTime: timeRange.endTime,
+						});
+					}
+				}
+			}
+			await push(paths.public.home);
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
 	return (
 		<Form {...form}>
@@ -191,7 +208,7 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 														<div className="flex flex-row">
 															<div className="flex flex-col">
 																<p>{day?.date?.toLocaleDateString()}</p>
-																{day.timeRange?.map((timeRange, index) => (
+																{day.timeRange?.map((timeRange) => (
 																	<div
 																		key={timeRange.id}
 																		className="flex items-center space-x-2 mt-2"
@@ -201,14 +218,23 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 																				<Input
 																					type="time"
 																					defaultValue={timeRange.startTime}
-																					onChange={(e) =>
-																						handleInputChange(
-																							day.date,
-																							timeRange.id,
-																							'startTime',
-																							e.target.value
-																						)
-																					}
+																					onChange={(e) => {
+																						if (timeRange.baseId) {
+																							handleInputChange(
+																								day.date,
+																								timeRange.baseId,
+																								'startTime',
+																								e.target.value
+																							);
+																						} else {
+																							handleNewTime(
+																								day.date,
+																								timeRange.id,
+																								'startTime',
+																								e.target.value
+																							);
+																						}
+																					}}
 																				/>
 																			</FormControl>
 																		</FormItem>
@@ -218,19 +244,29 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 																				<Input
 																					type="time"
 																					defaultValue={timeRange.endTime}
-																					onChange={(e) =>
-																						handleInputChange(
-																							day.date,
-																							timeRange.id,
-																							'endTime',
-																							e.target.value
-																						)
-																					}
+																					onChange={(e) => {
+																						if (timeRange.baseId) {
+																							handleInputChange(
+																								day.date,
+																								timeRange.baseId,
+																								'endTime',
+																								e.target.value
+																							);
+																						} else {
+																							handleNewTime(
+																								day.date,
+																								timeRange.id,
+																								'endTime',
+																								e.target.value
+																							);
+																						}
+																					}}
 																				/>
 																			</FormControl>
 																		</FormItem>
 																		<X
 																			onClick={() =>
+																				timeRange.id &&
 																				handleRemoveSlots(
 																					day.date,
 																					timeRange.id
@@ -240,7 +276,9 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 																	</div>
 																))}
 															</div>
-															<PlusCircle />
+															<PlusCircle
+																onClick={() => handleAddTimeSlot(day.date)}
+															/>
 														</div>
 													</li>
 												</FormItem>

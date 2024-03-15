@@ -59,13 +59,6 @@ export function MyResourcesDetailsView() {
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
-		defaultValues: {
-			available_time: 30,
-			description: 'Prueba',
-			location: 'Sevilla',
-			name: 'Recurso prueba',
-			time_measurement: 'minutes',
-		},
 	});
 
 	const { createResource } = useResourceActions();
