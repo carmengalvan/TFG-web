@@ -28,7 +28,8 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 	const startDate = date.from;
 	const endDate = date.to;
 
-	const { handleNewTime, handleInputChange } = useConnect(setSelectedDays);
+	const { handleNewTime, handleRemoveEmptySlots, handleInputChange } =
+		useConnect(setSelectedDays, selectedDays);
 
 	const { getDaysAvailabilities } = useMyDayAvailability();
 	const {
@@ -124,7 +125,7 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 		const updatedSelectedDays = selectedDays.map((selectedDay) => {
 			if (isSameDay(selectedDay.date, dayDate)) {
 				const updatedTimeRange = selectedDay.timeRange?.filter(
-					(timeRange) => timeRangeId !== timeRange.id
+					(timeRange) => timeRangeId !== timeRange.baseId
 				);
 				return {
 					...selectedDay,
@@ -265,13 +266,19 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 																			</FormControl>
 																		</FormItem>
 																		<X
-																			onClick={() =>
-																				timeRange.id &&
-																				handleRemoveSlots(
-																					day.date,
-																					timeRange.id
-																				)
-																			}
+																			onClick={() => {
+																				if (timeRange.baseId) {
+																					handleRemoveSlots(
+																						day.date,
+																						timeRange.baseId
+																					);
+																				} else {
+																					handleRemoveEmptySlots(
+																						day.date,
+																						timeRange.id
+																					);
+																				}
+																			}}
 																		/>
 																	</div>
 																))}

@@ -2,7 +2,8 @@ import { isSameDay } from 'date-fns';
 import { Dispatch, SetStateAction } from 'react';
 
 export const useConnect = (
-	setSelectedDays: Dispatch<SetStateAction<SelectedDay[]>>
+	setSelectedDays: Dispatch<SetStateAction<SelectedDay[]>>,
+	selectedDays: SelectedDay[]
 ) => {
 	const handleNewTime = (
 		dayDate: Date,
@@ -30,6 +31,22 @@ export const useConnect = (
 				return selectedDay;
 			});
 		});
+	};
+
+	const handleRemoveEmptySlots = async (dayDate: Date, timeRangeId: string) => {
+		const updatedSelectedDays = selectedDays.map((selectedDay) => {
+			if (isSameDay(selectedDay.date, dayDate)) {
+				const updatedTimeRange = selectedDay.timeRange?.filter(
+					(timeRange) => timeRangeId !== timeRange.id
+				);
+				return {
+					...selectedDay,
+					timeRange: updatedTimeRange,
+				};
+			}
+			return selectedDay;
+		});
+		setSelectedDays(updatedSelectedDays);
 	};
 
 	const handleInputChange = (
@@ -63,6 +80,7 @@ export const useConnect = (
 
 	return {
 		handleNewTime,
+		handleRemoveEmptySlots,
 		handleInputChange,
 	};
 };
