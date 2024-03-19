@@ -49,8 +49,11 @@ export const CheckboxReactHookFormMultiple = ({
 		},
 	});
 
-	const { handleAddTimeSlot, handleRemoveTimeSlot, createDayAvailability } =
-		useConnect(form);
+	const {
+		handleAddTimeSlot,
+		handleRemoveTimeSlot,
+		createOrUpdateAvailability,
+	} = useConnect(form);
 
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -69,12 +72,20 @@ export const CheckboxReactHookFormMultiple = ({
 					checkedDays.find((checkedDay) => checkedDay.id === getDayOfWeek(day))
 						?.timeSlots ?? [];
 				for (const timeSlot of timeSlots) {
-					const response = await createDayAvailability({
-						resourceId: resourceId,
+					await createOrUpdateAvailability({
 						input: {
-							day: day,
-							startTime: timeSlot[0],
-							endTime: timeSlot[1],
+							resourceId: resourceId,
+							items: [
+								{
+									day: day,
+									timeRange: [
+										{
+											startTime: timeSlot[0],
+											endTime: timeSlot[1],
+										},
+									],
+								},
+							],
 						},
 					});
 				}

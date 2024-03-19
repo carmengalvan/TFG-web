@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { FormSchema } from './constants';
 
 export const useConnect = (form: UseFormReturn<z.infer<typeof FormSchema>>) => {
-	const { createDayAvailability } = useDayAvailabilityActions();
+	const { createOrUpdateAvailability } = useDayAvailabilityActions();
 
 	function handleAddTimeSlot(dayId: string) {
 		const currentWeekdays = form.watch('weekdays');
@@ -40,6 +40,6 @@ export const useConnect = (form: UseFormReturn<z.infer<typeof FormSchema>>) => {
 	return {
 		handleAddTimeSlot,
 		handleRemoveTimeSlot,
-		createDayAvailability,
+		createOrUpdateAvailability,
 	};
 };

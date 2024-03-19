@@ -4,6 +4,11 @@ input ChangePasswordInput {
   repeatPassword: String
 }
 
+input CreateOrUpdateAvailabilityInput {
+  items: [DayAvailabilityInput!]!
+  resourceId: UUID!
+}
+
 """
 Date (isoformat)
 """
@@ -21,8 +26,7 @@ type DayAvailabilityGroupType {
 
 input DayAvailabilityInput {
   day: Date!
-  endTime: Time!
-  startTime: Time!
+  timeRange: [TimeRangeInput!]!
 }
 
 type DayAvailabilityType {
@@ -60,12 +64,9 @@ type Mutation {
   changePassword(input: ChangePasswordInput!): Boolean!
 
   """
-  Creates a day availability
+  Creates or updates day availability
   """
-  createDayAvailability(
-    input: DayAvailabilityInput!
-    resourceId: UUID!
-  ): DayAvailabilityType!
+  createOrUpdateAvailability(input: CreateOrUpdateAvailabilityInput!): Boolean!
 
   """
   Creates a resource
@@ -87,13 +88,6 @@ type Mutation {
   register(input: RegisterInput!): UserType!
   requestResetPassword(input: RequestResetPasswordInput!): Boolean!
   resetPassword(input: ResetPasswordInput!): Boolean!
-
-  """
-  Updates a day availability
-  """
-  updateDayAvailability(
-    input: UpdateDayAvailabilityInput!
-  ): DayAvailabilityType!
 
   """
   Updates a resource
@@ -182,13 +176,13 @@ Time (isoformat)
 """
 scalar Time
 
-scalar UUID
-
-input UpdateDayAvailabilityInput {
-  dayAvailabilityId: UUID!
+input TimeRangeInput {
+  dayAvailabilityId: UUID
   endTime: Time!
   startTime: Time!
 }
+
+scalar UUID
 
 input UpdateResourceInput {
   availableTime: Int

@@ -1,41 +1,33 @@
 import {
-	CreateDayAvailabilityDocument,
-	CreateDayAvailabilityMutation,
-	CreateDayAvailabilityMutationVariables,
+	CreateOrUpdateAvailabilityDocument,
+	CreateOrUpdateAvailabilityMutation,
+	CreateOrUpdateAvailabilityMutationVariables,
 	DeleteDayAvailabilityDocument,
 	DeleteDayAvailabilityMutation,
 	DeleteDayAvailabilityMutationVariables,
-	UpdateDayAvailabilityDocument,
-	UpdateDayAvailabilityMutation,
-	UpdateDayAvailabilityMutationVariables,
 } from '@/graphql/generated/types';
 import { ApolloError, useMutation } from '@apollo/client';
 import { useCallback } from 'react';
 
 export function useDayAvailabilityActions() {
-	const [performCreate] = useMutation<
-		CreateDayAvailabilityMutation,
-		CreateDayAvailabilityMutationVariables
-	>(CreateDayAvailabilityDocument);
+	const [performCreateOrUpdateAvailability] = useMutation<
+		CreateOrUpdateAvailabilityMutation,
+		CreateOrUpdateAvailabilityMutationVariables
+	>(CreateOrUpdateAvailabilityDocument);
 
 	const [performDelete] = useMutation<
 		DeleteDayAvailabilityMutation,
 		DeleteDayAvailabilityMutationVariables
 	>(DeleteDayAvailabilityDocument);
 
-	const [performUpdate] = useMutation<
-		UpdateDayAvailabilityMutation,
-		UpdateDayAvailabilityMutationVariables
-	>(UpdateDayAvailabilityDocument);
-
-	const createDayAvailability = useCallback(
-		async (variables: CreateDayAvailabilityMutationVariables) => {
-			const raw = await performCreate({
+	const createOrUpdateAvailability = useCallback(
+		async (variables: CreateOrUpdateAvailabilityMutationVariables) => {
+			const raw = await performCreateOrUpdateAvailability({
 				variables,
 			});
-			return raw.data?.createDayAvailability;
+			return raw.data?.createOrUpdateAvailability;
 		},
-		[performCreate]
+		[performCreateOrUpdateAvailability]
 	);
 
 	const deleteDayAvailability = useCallback(
@@ -56,19 +48,8 @@ export function useDayAvailabilityActions() {
 		[performDelete]
 	);
 
-	const updateDayAvailability = useCallback(
-		async (input: UpdateDayAvailabilityMutationVariables['input']) => {
-			const raw = await performUpdate({
-				variables: { input },
-			});
-			return raw.data?.updateDayAvailability;
-		},
-		[performUpdate]
-	);
-
 	return {
-		createDayAvailability,
+		createOrUpdateAvailability,
 		deleteDayAvailability,
-		updateDayAvailability,
 	};
 }
