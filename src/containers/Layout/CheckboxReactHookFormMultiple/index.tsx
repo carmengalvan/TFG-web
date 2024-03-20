@@ -67,29 +67,29 @@ export const CheckboxReactHookFormMultiple = ({
 				}));
 			const checkedDayIds = checkedDays.map((checkedDay) => checkedDay.id);
 			const days = getDaysBetweenDates(startDate, endDate, checkedDayIds);
+
+			const itemsToCreateOrUpdate = [];
 			for (const day of days) {
 				const timeSlots =
 					checkedDays.find((checkedDay) => checkedDay.id === getDayOfWeek(day))
 						?.timeSlots ?? [];
-				for (const timeSlot of timeSlots) {
-					await createOrUpdateAvailability({
-						input: {
-							resourceId: resourceId,
-							items: [
-								{
-									day: day,
-									timeRange: [
-										{
-											startTime: timeSlot[0],
-											endTime: timeSlot[1],
-										},
-									],
-								},
-							],
-						},
-					});
-				}
+				const timeRange = timeSlots.map((timeSlot) => ({
+					startTime: timeSlot[0],
+					endTime: timeSlot[1],
+				}));
+				itemsToCreateOrUpdate.push({
+					day: day,
+					timeRange: timeRange,
+				});
 			}
+			console.log('ITEMS', itemsToCreateOrUpdate);
+			await createOrUpdateAvailability({
+				input: {
+					resourceId: resourceId,
+					items: itemsToCreateOrUpdate,
+				},
+			});
+
 			onButtonClick();
 		} catch (error) {
 			if (isGraphqlMessageError(error)) {

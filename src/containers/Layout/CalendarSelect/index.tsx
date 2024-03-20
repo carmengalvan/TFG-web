@@ -34,11 +34,8 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 		useConnect(setSelectedDays, selectedDays);
 
 	const { getDaysAvailabilities } = useMyDayAvailability();
-	const {
-		createDayAvailability,
-		deleteDayAvailability,
-		updateDayAvailability,
-	} = useDayAvailabilityActions();
+	const { createOrUpdateAvailability, deleteDayAvailability } =
+		useDayAvailabilityActions();
 
 	const getNewSelectedDay = async (day: Date): Promise<SelectedDay> => {
 		const myDayAvailability = await getDaysAvailabilities({
@@ -146,34 +143,23 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 	const { push } = useRouter();
 	async function onSubmit() {
 		try {
-			for (const day of sortedSelectedDays) {
-				//.reverse is so that there is no error when updating two incompatible time slots in the backend
-				const timeRangeToUpdate = day.timeRange
-					?.filter((timeRange) => !!timeRange.baseId)
-					.reverse();
-				const timeRangeToCreate = day.timeRange
-					?.filter((timeRange) => !timeRange.baseId)
-					.reverse();
-				for (const timeRange of timeRangeToUpdate ?? []) {
-					if (timeRange.baseId) {
-						await updateDayAvailability({
-							dayAvailabilityId: timeRange.baseId,
+			const items = sortedSelectedDays.map((day) => ({
+				day: formatDate(day.date),
+				timeRange: day.timeRange
+					? day.timeRange.map((timeRange) => ({
+							dayAvailabilityId: timeRange.baseId || undefined,
 							startTime: timeRange.startTime,
 							endTime: timeRange.endTime,
-						});
-					}
-				}
-				for (const timeRange of timeRangeToCreate ?? []) {
-					await createDayAvailability({
-						resourceId: resourceId,
-						input: {
-							day: formatDate(day.date),
-							startTime: timeRange.startTime,
-							endTime: timeRange.endTime,
-						},
-					});
-				}
-			}
+					  }))
+					: [],
+			}));
+			await createOrUpdateAvailability({
+				input: {
+					resourceId: resourceId,
+					items: items,
+				},
+			});
+
 			await push(paths.public.home);
 		} catch (error) {
 			if (isGraphqlMessageError(error)) {
