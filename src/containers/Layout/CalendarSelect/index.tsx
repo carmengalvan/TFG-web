@@ -297,11 +297,7 @@ export const CalendarSelect = ({ resourceId, date }: CalendarSelectProps) => {
 				</div>
 				<div className="mt-10 mb-5 ml-32">
 					<Button type="submit">Guardar</Button>
-					{errorMessage && (
-						<p className="mt-5 text-red-600">
-							Por favor, ordene los horarios cronológicamente
-						</p>
-					)}
+					{errorMessage && <p className="mt-5 text-red-600">{errorMessage}</p>}
 				</div>
 			</form>
 		</Form>
