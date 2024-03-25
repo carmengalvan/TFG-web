@@ -182,6 +182,8 @@ export type Query = {
 	myDailyAvailability: Array<DayAvailabilityGroupType>;
 	/** Returns a list of your resources. */
 	myResources: PaginatedResourceType;
+	/** Return a resource */
+	resource: ResourceType;
 };
 
 export type QueryMyDailyAvailabilityArgs = {
@@ -190,6 +192,10 @@ export type QueryMyDailyAvailabilityArgs = {
 
 export type QueryMyResourcesArgs = {
 	pagination?: InputMaybe<PaginationInput>;
+};
+
+export type QueryResourceArgs = {
+	id: Scalars['UUID']['input'];
 };
 
 export type RegisterInput = {
@@ -378,6 +384,23 @@ export type MyResourcesQuery = {
 			location?: string | undefined;
 			user: { email: string };
 		}>;
+	};
+};
+
+export type ResourceQueryVariables = Exact<{
+	id: Scalars['UUID']['input'];
+}>;
+
+export type ResourceQuery = {
+	resource: {
+		id: string;
+		name: string;
+		description: string;
+		availableTime: number;
+		startDate: string;
+		endDate: string;
+		location?: string | undefined;
+		user: { email: string };
 	};
 };
 
@@ -950,6 +973,70 @@ export const MyResourcesDocument = {
 		},
 	],
 } as unknown as DocumentNode<MyResourcesQuery, MyResourcesQueryVariables>;
+export const ResourceDocument = {
+	kind: 'Document',
+	definitions: [
+		{
+			kind: 'OperationDefinition',
+			operation: 'query',
+			name: { kind: 'Name', value: 'resource' },
+			variableDefinitions: [
+				{
+					kind: 'VariableDefinition',
+					variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+					type: {
+						kind: 'NonNullType',
+						type: { kind: 'NamedType', name: { kind: 'Name', value: 'UUID' } },
+					},
+				},
+			],
+			selectionSet: {
+				kind: 'SelectionSet',
+				selections: [
+					{
+						kind: 'Field',
+						name: { kind: 'Name', value: 'resource' },
+						arguments: [
+							{
+								kind: 'Argument',
+								name: { kind: 'Name', value: 'id' },
+								value: {
+									kind: 'Variable',
+									name: { kind: 'Name', value: 'id' },
+								},
+							},
+						],
+						selectionSet: {
+							kind: 'SelectionSet',
+							selections: [
+								{
+									kind: 'Field',
+									name: { kind: 'Name', value: 'user' },
+									selectionSet: {
+										kind: 'SelectionSet',
+										selections: [
+											{ kind: 'Field', name: { kind: 'Name', value: 'email' } },
+										],
+									},
+								},
+								{ kind: 'Field', name: { kind: 'Name', value: 'id' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'name' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'description' } },
+								{
+									kind: 'Field',
+									name: { kind: 'Name', value: 'availableTime' },
+								},
+								{ kind: 'Field', name: { kind: 'Name', value: 'startDate' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'endDate' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'location' } },
+							],
+						},
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<ResourceQuery, ResourceQueryVariables>;
 export const GetMeDocument = {
 	kind: 'Document',
 	definitions: [

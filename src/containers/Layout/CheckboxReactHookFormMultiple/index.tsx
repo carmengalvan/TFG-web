@@ -82,7 +82,6 @@ export const CheckboxReactHookFormMultiple = ({
 					timeRange: timeRange,
 				});
 			}
-			console.log('ITEMS', itemsToCreateOrUpdate);
 			await createOrUpdateAvailability({
 				input: {
 					resourceId: resourceId,

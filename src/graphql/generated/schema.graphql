@@ -131,6 +131,11 @@ type Query {
   Returns a list of your resources.
   """
   myResources(pagination: PaginationInput = null): PaginatedResourceType!
+
+  """
+  Return a resource
+  """
+  resource(id: UUID!): ResourceType!
 }
 
 input RegisterInput {
