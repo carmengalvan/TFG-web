@@ -34,7 +34,7 @@ export function MyResourcesDetailsView() {
 		to: resource ? new Date(resource?.endDate) : addDays(new Date(), 15),
 	});
 
-	const { createResource } = useResourceActions();
+	const { createResource, updateResource } = useResourceActions();
 
 	const [showCheckbox, setShowCheckbox] = useState(false);
 	const [showThird, setShowThird] = useState(false);
@@ -56,17 +56,33 @@ export function MyResourcesDetailsView() {
 			const startDateString = date?.from ? format(date.from, 'yyyy-MM-dd') : '';
 			const endDateString = date?.to ? format(date.to, 'yyyy-MM-dd') : '';
 
-			const response = await createResource({
-				name: data.name,
-				description: data.description,
-				location: data.location,
-				availableTime: data.available_time,
-				startDate: startDateString,
-				endDate: endDateString,
-			});
-			if (response?.id) {
-				setResourceId(response.id);
-				setShowCheckbox(true);
+			if (!isEdition) {
+				const response = await createResource({
+					name: data.name,
+					description: data.description,
+					location: data.location,
+					availableTime: data.available_time,
+					startDate: startDateString,
+					endDate: endDateString,
+				});
+				if (response?.id) {
+					setResourceId(response.id);
+					setShowCheckbox(true);
+				}
+			} else {
+				const response = await updateResource({
+					resourceId: id as string,
+					name: data.name,
+					description: data.description,
+					location: data.location,
+					availableTime: data.available_time,
+					startDate: startDateString,
+					endDate: endDateString,
+				});
+				if (response?.id) {
+					setResourceId(response.id);
+					setShowCheckbox(true);
+				}
 			}
 		} catch (e) {
 			if (isGraphqlMessageError(e)) {
