@@ -25,6 +25,7 @@ import { useConnect } from './connect';
 import { FormSchema, daysOfWeekSpanish } from './constants';
 
 interface CheckboxReactHookFormMultipleProps {
+	isEdition: boolean;
 	onButtonClick: () => void;
 	resourceId: string;
 	startDate: Date;
@@ -32,6 +33,7 @@ interface CheckboxReactHookFormMultipleProps {
 }
 
 export const CheckboxReactHookFormMultiple = ({
+	isEdition,
 	onButtonClick,
 	resourceId,
 	startDate,

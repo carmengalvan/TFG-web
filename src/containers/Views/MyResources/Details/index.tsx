@@ -20,7 +20,7 @@ export function MyResourcesDetailsView() {
 	const router = useRouter();
 	const { id } = router.query;
 
-	const [isEdition, setIsEdition] = useState<boolean>();
+	const [isEdition, setIsEdition] = useState<boolean>(false);
 	useEffect(() => {
 		if (id) {
 			setIsEdition(true);
@@ -37,11 +37,11 @@ export function MyResourcesDetailsView() {
 	const { createResource, updateResource } = useResourceActions();
 
 	const [showCheckbox, setShowCheckbox] = useState(false);
-	const [showThird, setShowThird] = useState(false);
+	const [showCalendarSelect, setShowCalendarSelect] = useState(false);
 
 	const handleCheckboxButton = () => {
 		setShowCheckbox(false);
-		setShowThird(true);
+		setShowCalendarSelect(true);
 	};
 
 	const [resourceId, setResourceId] = useState<string>('');
@@ -81,7 +81,7 @@ export function MyResourcesDetailsView() {
 				});
 				if (response?.id) {
 					setResourceId(response.id);
-					setShowCheckbox(true);
+					setShowCalendarSelect(true);
 				}
 			}
 		} catch (e) {
@@ -94,7 +94,7 @@ export function MyResourcesDetailsView() {
 	return (
 		<>
 			<div className="flex flex-row w-full h-full">
-				{showThird ? (
+				{showCalendarSelect ? (
 					<>
 						<div className="w-[350px]">
 							<Menu
@@ -110,7 +110,10 @@ export function MyResourcesDetailsView() {
 							{date?.from && date?.to && (
 								<CalendarSelect
 									resourceId={resourceId}
+									isEdition={isEdition}
 									date={{ from: date.from, to: date.to }}
+									setShowCheckbox={setShowCheckbox}
+									setShowCalendarSelect={setShowCalendarSelect}
 								/>
 							)}
 						</div>
@@ -132,7 +135,6 @@ export function MyResourcesDetailsView() {
 								date={date}
 								resource={resource}
 								errorMessage={errorMessage}
-								isEdition={isEdition}
 								onSubmit={onSubmit}
 								setDate={setDate}
 							/>
@@ -153,6 +155,7 @@ export function MyResourcesDetailsView() {
 							/>
 							{date?.from && date?.to && (
 								<CheckboxReactHookFormMultiple
+									isEdition={isEdition}
 									resourceId={resourceId}
 									startDate={date.from}
 									endDate={date.to}

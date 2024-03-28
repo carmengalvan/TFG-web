@@ -33,7 +33,6 @@ import { FormSchema } from './constants';
 
 export default function ResourceFormDetail({
 	resource,
-	isEdition,
 	onSubmit,
 	date,
 	setDate,
@@ -53,7 +52,6 @@ export default function ResourceFormDetail({
 				};
 		  }
 		| undefined;
-	isEdition: boolean | undefined;
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	onSubmit: any;
 	date: DateRange | undefined;
@@ -65,7 +63,11 @@ export default function ResourceFormDetail({
 		defaultValues: {
 			name: resource?.name,
 			description: resource?.description,
-			available_time: resource?.availableTime,
+			available_time: resource?.availableTime
+				? resource.availableTime >= 60
+					? resource.availableTime / 60
+					: resource.availableTime
+				: undefined,
 			location: resource?.location,
 			time_measurement:
 				resource?.availableTime && resource.availableTime > 60
