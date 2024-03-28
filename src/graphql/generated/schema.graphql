@@ -74,6 +74,11 @@ type Mutation {
   createResource(input: ResourceInput!): ResourceType!
 
   """
+  Deletes all availabilities from a resource
+  """
+  deleteAllAvailabilities(resourceId: UUID!): Boolean!
+
+  """
   Delete a day availability
   """
   deleteDayAvailability(id: UUID!): Boolean!

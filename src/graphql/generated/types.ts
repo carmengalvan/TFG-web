@@ -90,6 +90,8 @@ export type Mutation = {
 	createOrUpdateAvailability: Scalars['Boolean']['output'];
 	/** Creates a resource */
 	createResource: ResourceType;
+	/** Deletes all availabilities from a resource */
+	deleteAllAvailabilities: Scalars['Boolean']['output'];
 	/** Delete a day availability */
 	deleteDayAvailability: Scalars['Boolean']['output'];
 	/** Delete your resource */
@@ -115,6 +117,10 @@ export type MutationCreateOrUpdateAvailabilityArgs = {
 
 export type MutationCreateResourceArgs = {
 	input: ResourceInput;
+};
+
+export type MutationDeleteAllAvailabilitiesArgs = {
+	resourceId: Scalars['UUID']['input'];
 };
 
 export type MutationDeleteDayAvailabilityArgs = {
@@ -308,6 +314,14 @@ export type CreateOrUpdateAvailabilityMutationVariables = Exact<{
 
 export type CreateOrUpdateAvailabilityMutation = {
 	createOrUpdateAvailability: boolean;
+};
+
+export type DeleteAllAvailabilitiesMutationVariables = Exact<{
+	resourceId: Scalars['UUID']['input'];
+}>;
+
+export type DeleteAllAvailabilitiesMutation = {
+	deleteAllAvailabilities: boolean;
 };
 
 export type DeleteDayAvailabilityMutationVariables = Exact<{
@@ -627,6 +641,51 @@ export const CreateOrUpdateAvailabilityDocument = {
 } as unknown as DocumentNode<
 	CreateOrUpdateAvailabilityMutation,
 	CreateOrUpdateAvailabilityMutationVariables
+>;
+export const DeleteAllAvailabilitiesDocument = {
+	kind: 'Document',
+	definitions: [
+		{
+			kind: 'OperationDefinition',
+			operation: 'mutation',
+			name: { kind: 'Name', value: 'deleteAllAvailabilities' },
+			variableDefinitions: [
+				{
+					kind: 'VariableDefinition',
+					variable: {
+						kind: 'Variable',
+						name: { kind: 'Name', value: 'resourceId' },
+					},
+					type: {
+						kind: 'NonNullType',
+						type: { kind: 'NamedType', name: { kind: 'Name', value: 'UUID' } },
+					},
+				},
+			],
+			selectionSet: {
+				kind: 'SelectionSet',
+				selections: [
+					{
+						kind: 'Field',
+						name: { kind: 'Name', value: 'deleteAllAvailabilities' },
+						arguments: [
+							{
+								kind: 'Argument',
+								name: { kind: 'Name', value: 'resourceId' },
+								value: {
+									kind: 'Variable',
+									name: { kind: 'Name', value: 'resourceId' },
+								},
+							},
+						],
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<
+	DeleteAllAvailabilitiesMutation,
+	DeleteAllAvailabilitiesMutationVariables
 >;
 export const DeleteDayAvailabilityDocument = {
 	kind: 'Document',

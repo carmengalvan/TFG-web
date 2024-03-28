@@ -55,6 +55,7 @@ export const CheckboxReactHookFormMultiple = ({
 		handleAddTimeSlot,
 		handleRemoveTimeSlot,
 		createOrUpdateAvailability,
+		deleteAllAvailabilities,
 	} = useConnect(form);
 
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -83,6 +84,9 @@ export const CheckboxReactHookFormMultiple = ({
 					day: day,
 					timeRange: timeRange,
 				});
+			}
+			if (isEdition) {
+				deleteAllAvailabilities(resourceId);
 			}
 			await createOrUpdateAvailability({
 				input: {
@@ -121,7 +125,17 @@ export const CheckboxReactHookFormMultiple = ({
 								</FormLabel>
 								<FormDescription>
 									Selecciona los días y franjas horarias en los que tu recurso
-									estará disponible
+									estará disponible.
+									{isEdition ? (
+										<>
+											<br />
+											<span className="text-red-400">
+												¡Atención! Editar las disponibilidades diarias eliminará
+												las creadas y las disponibilidades personalizadas, para
+												posteriormente crear las seleccionadas a continuación.
+											</span>
+										</>
+									) : null}
 								</FormDescription>
 							</div>
 							{weekdays.map((item) => (
