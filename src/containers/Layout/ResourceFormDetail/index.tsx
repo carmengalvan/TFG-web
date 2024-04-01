@@ -61,6 +61,12 @@ export default function ResourceFormDetail({
 }) {
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			time_measurement:
+				resource?.availableTime && resource.availableTime >= 60
+					? 'hours'
+					: 'minutes',
+		},
 	});
 
 	useEffect(() => {
@@ -74,12 +80,9 @@ export default function ResourceFormDetail({
 					: resource.availableTime
 			);
 			form.setValue('location', resource.location || '');
-			form.setValue(
-				'time_measurement',
-				resource.availableTime && resource.availableTime > 60
-					? 'hours'
-					: 'minutes'
-			);
+			const timeMeasurement =
+				resource.availableTime >= 60 ? 'hours' : 'minutes';
+			form.setValue('time_measurement', timeMeasurement);
 		}
 	}, [resource, form]);
 

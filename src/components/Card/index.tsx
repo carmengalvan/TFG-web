@@ -108,7 +108,9 @@ const CustomCard = ({
 						<div className="flex items-center">
 							<CalendarDays className="mr-1 h-3 w-3" />
 							Tiempo disponible por reserva: {'   '}
-							{availableTime} minutos
+							{availableTime >= 60
+								? `${availableTime / 60} hora${availableTime >= 120 ? 's' : ''}`
+								: `${availableTime} minutos`}
 						</div>
 					</div>
 				</CardContent>
