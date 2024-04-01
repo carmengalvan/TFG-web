@@ -30,9 +30,19 @@ export function MyResourcesDetailsView() {
 	const { resource } = useResource({ id: id as string });
 
 	const [date, setDate] = React.useState<DateRange | undefined>({
-		from: resource ? new Date(resource?.startDate) : new Date(),
-		to: resource ? new Date(resource?.endDate) : addDays(new Date(), 15),
+		from: new Date(),
+		to: addDays(new Date(), 15),
 	});
+
+	useEffect(() => {
+		if (resource) {
+			const newDateRange: DateRange = {
+				from: new Date(resource.startDate),
+				to: new Date(resource.endDate),
+			};
+			setDate(newDateRange);
+		}
+	}, [resource]);
 
 	const { createResource, updateResource } = useResourceActions();
 

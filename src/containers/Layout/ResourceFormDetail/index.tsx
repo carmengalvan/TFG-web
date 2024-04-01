@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
+import { useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -60,21 +61,27 @@ export default function ResourceFormDetail({
 }) {
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
-		defaultValues: {
-			name: resource?.name,
-			description: resource?.description,
-			available_time: resource?.availableTime
-				? resource.availableTime >= 60
+	});
+
+	useEffect(() => {
+		if (resource) {
+			form.setValue('name', resource.name);
+			form.setValue('description', resource.description);
+			form.setValue(
+				'available_time',
+				resource.availableTime >= 60
 					? resource.availableTime / 60
 					: resource.availableTime
-				: undefined,
-			location: resource?.location,
-			time_measurement:
-				resource?.availableTime && resource.availableTime > 60
+			);
+			form.setValue('location', resource.location || '');
+			form.setValue(
+				'time_measurement',
+				resource.availableTime && resource.availableTime > 60
 					? 'hours'
-					: 'minutes',
-		},
-	});
+					: 'minutes'
+			);
+		}
+	}, [resource, form]);
 
 	return (
 		<Form {...form}>
