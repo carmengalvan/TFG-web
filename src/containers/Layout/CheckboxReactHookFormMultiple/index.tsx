@@ -87,13 +87,20 @@ export const CheckboxReactHookFormMultiple = ({
 			}
 			if (isEdition) {
 				deleteAllAvailabilities(resourceId);
+				await createOrUpdateAvailability({
+					input: {
+						resourceId: resourceId,
+						items: itemsToCreateOrUpdate,
+					},
+				});
+			} else {
+				await createOrUpdateAvailability({
+					input: {
+						resourceId: resourceId,
+						items: itemsToCreateOrUpdate,
+					},
+				});
 			}
-			await createOrUpdateAvailability({
-				input: {
-					resourceId: resourceId,
-					items: itemsToCreateOrUpdate,
-				},
-			});
 
 			onButtonClick();
 		} catch (error) {
