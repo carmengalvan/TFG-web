@@ -18,8 +18,10 @@ export const useResourceFromPublicName = ({
 	});
 
 	const resources = data?.resourceFromPublicName;
+	const userDoesntExist = typeof publicName !== 'string';
 
 	return {
 		resources,
+		userDoesntExist,
 	};
 };

@@ -9,12 +9,14 @@ import { useRouter } from 'next/router';
 export function ResourceReservationView() {
 	const router = useRouter();
 	const { publicName } = router.query;
+	const publicNameString = typeof publicName === 'string' ? publicName : '';
+	const { resources, userDoesntExist } = useResourceFromPublicName({
+		publicName: publicNameString,
+	});
 
-	if (typeof publicName !== 'string') {
+	if (userDoesntExist) {
 		return <UserDoesntExist />;
 	}
-
-	const { resources } = useResourceFromPublicName({ publicName });
 
 	if (!resources || resources.length === 0) {
 		return <UserDoesntExist />;
@@ -48,7 +50,7 @@ export function ResourceReservationView() {
 				resource={resource}
 				dateRange={dateRange}
 				availability={availability}
-				publicName={publicName}
+				publicName={publicNameString}
 				id={id}
 			/>
 		);
