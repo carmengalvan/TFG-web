@@ -11,20 +11,16 @@ export function ResourceReservationView() {
 	const { publicName } = router.query;
 
 	if (typeof publicName !== 'string') {
-		return <div>Cargando...</div>;
+		return <UserDoesntExist />;
 	}
 
 	const { resources } = useResourceFromPublicName({ publicName });
 
 	if (!resources || resources.length === 0) {
-		return <UserDoesntExist publicName={publicName} />;
+		return <UserDoesntExist />;
 	}
 
 	const user = resources?.[0].user;
-
-	if (!user) {
-		return <div>Cargando...</div>;
-	}
 
 	const title = `${user.firstName} ${user.lastName}`;
 	const cards = resources.map((resource) => {

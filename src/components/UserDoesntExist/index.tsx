@@ -1,8 +1,4 @@
-interface UserDoesntExistProps {
-	publicName: string;
-}
-
-export const UserDoesntExist = ({ publicName }: UserDoesntExistProps) => {
+export const UserDoesntExist = () => {
 	return (
 		<div className="bg-green-200 min-h-screen flex justify-center items-center relative">
 			<img
@@ -16,7 +12,7 @@ export const UserDoesntExist = ({ publicName }: UserDoesntExistProps) => {
 					Ups! Parece que hubo un problema.
 				</h1>
 				<p className="text-lg text-gray-800">
-					El usuario {publicName} no existe o no tiene recursos disponibles.
+					El usuario no existe o no tiene recursos disponibles.
 				</p>
 				<p className="text-lg text-gray-800">¡Inténtalo de nuevo!</p>
 				<p className="text-sm text-gray-600">Error 404</p>
