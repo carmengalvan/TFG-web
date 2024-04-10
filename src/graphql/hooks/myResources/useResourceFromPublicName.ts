@@ -15,7 +15,7 @@ export const useResourceFromPublicName = ({
 		variables: {
 			publicName: String(publicName),
 		},
-		skip: !!publicName && typeof publicName !== 'string',
+		skip: (!!publicName && typeof publicName !== 'string') || !publicName,
 	});
 
 	const resources = data?.resourceFromPublicName;

@@ -13,7 +13,7 @@ export const useResource = ({ id }: { id?: string | string[] }) => {
 		variables: {
 			id: String(id),
 		},
-		skip: !!id && typeof id !== 'string',
+		skip: (!!id && typeof id !== 'string') || !id,
 	});
 
 	const resource = data?.resource;

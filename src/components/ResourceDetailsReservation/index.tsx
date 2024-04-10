@@ -11,9 +11,7 @@ const ResourceDetailsReservation = ({
 	id,
 	children,
 }: ResourceDetailsReservationProps) => {
-	console.log(id);
 	const { resource, isResourceLoading } = useResource({ id });
-
 	const cardColor = generateRandomColor();
 	return (
 		<div className="flex justify-center items-center h-screen">
@@ -28,7 +26,7 @@ const ResourceDetailsReservation = ({
 						<div className="text-4xl font-semibold">{resource?.name}</div>
 						<div className="mt-10 flex flex-row">
 							<Info />
-							<div className="text-xl ml-4 mb-1">{resource?.description}</div>x
+							<div className="text-xl ml-4 mb-1">{resource?.description}</div>
 						</div>
 						<div className="mt-10 flex flex-row">
 							<Clock9 />
