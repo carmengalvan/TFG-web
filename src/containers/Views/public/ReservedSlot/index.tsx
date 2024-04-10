@@ -1,28 +1,27 @@
 import HeaderReservation from '@/components/HeaderReservation';
 import ResourceDetailsReservation from '@/components/ResourceDetailsReservation';
 import { UserDoesntExist } from '@/components/UserDoesntExist';
-import { useResourceFromPublicName } from '@/graphql/hooks/myResources/useResourceFromPublicName';
+import { useResource } from '@/graphql/hooks/myResources/useResource';
 import { useRouter } from 'next/router';
 
 export function ReservedSlotView() {
 	const router = useRouter();
-	const { publicName, id } = router.query;
+	const { id } = router.query;
 
-	const { resources, userDoesntExist } = useResourceFromPublicName({
-		publicName: publicName,
-	});
+	const { resource, isResourceLoading } = useResource({ id: id });
 
-	if (userDoesntExist || !resources || resources.length === 0) {
+	if (!resource) {
 		return <UserDoesntExist />;
 	}
-
-	const user = resources[0].user;
-	const title = `${user.firstName} ${user.lastName}`;
+	const title = `${resource.user.firstName} ${resource.user.lastName}`;
 
 	return (
 		<>
 			<HeaderReservation title={title} />
-			{id && typeof id === 'string' && <ResourceDetailsReservation id={id} />}
+			<ResourceDetailsReservation
+				resource={resource}
+				isResourceLoading={isResourceLoading}
+			/>
 		</>
 	);
 }

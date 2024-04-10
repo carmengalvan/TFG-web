@@ -1,17 +1,32 @@
-import { useResource } from '@/graphql/hooks/myResources/useResource';
 import { generateRandomColor } from '@/utils/generateRandomColor';
 import { Clock9, Info, MapPin } from 'lucide-react';
 
 interface ResourceDetailsReservationProps {
-	id: string;
+	resource:
+		| {
+				id: string;
+				name: string;
+				description: string;
+				availableTime: number;
+				startDate: string;
+				endDate: string;
+				location?: string | undefined;
+				user: {
+					email: string;
+					firstName: string;
+					lastName: string;
+				};
+		  }
+		| undefined;
+	isResourceLoading: boolean;
 	children?: React.ReactNode;
 }
 
 const ResourceDetailsReservation = ({
-	id,
+	resource,
+	isResourceLoading,
 	children,
 }: ResourceDetailsReservationProps) => {
-	const { resource, isResourceLoading } = useResource({ id });
 	const cardColor = generateRandomColor();
 	return (
 		<div className="flex justify-center items-center h-screen">
