@@ -502,6 +502,14 @@ export type ResourceFromPublicNameQuery = {
 	}>;
 };
 
+export type GetSlotsQueryVariables = Exact<{
+	input: GetSlotsInput;
+}>;
+
+export type GetSlotsQuery = {
+	getSlots: Array<{ startTime: string; endTime: string; reserved: boolean }>;
+};
+
 export type GetMeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetMeQuery = {
@@ -1358,6 +1366,59 @@ export const ResourceFromPublicNameDocument = {
 	ResourceFromPublicNameQuery,
 	ResourceFromPublicNameQueryVariables
 >;
+export const GetSlotsDocument = {
+	kind: 'Document',
+	definitions: [
+		{
+			kind: 'OperationDefinition',
+			operation: 'query',
+			name: { kind: 'Name', value: 'getSlots' },
+			variableDefinitions: [
+				{
+					kind: 'VariableDefinition',
+					variable: {
+						kind: 'Variable',
+						name: { kind: 'Name', value: 'input' },
+					},
+					type: {
+						kind: 'NonNullType',
+						type: {
+							kind: 'NamedType',
+							name: { kind: 'Name', value: 'GetSlotsInput' },
+						},
+					},
+				},
+			],
+			selectionSet: {
+				kind: 'SelectionSet',
+				selections: [
+					{
+						kind: 'Field',
+						name: { kind: 'Name', value: 'getSlots' },
+						arguments: [
+							{
+								kind: 'Argument',
+								name: { kind: 'Name', value: 'input' },
+								value: {
+									kind: 'Variable',
+									name: { kind: 'Name', value: 'input' },
+								},
+							},
+						],
+						selectionSet: {
+							kind: 'SelectionSet',
+							selections: [
+								{ kind: 'Field', name: { kind: 'Name', value: 'startTime' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'endTime' } },
+								{ kind: 'Field', name: { kind: 'Name', value: 'reserved' } },
+							],
+						},
+					},
+				],
+			},
+		},
+	],
+} as unknown as DocumentNode<GetSlotsQuery, GetSlotsQueryVariables>;
 export const GetMeDocument = {
 	kind: 'Document',
 	definitions: [

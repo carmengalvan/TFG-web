@@ -37,7 +37,7 @@ const ResourceDetailsReservation = ({
 				{isResourceLoading ? (
 					<div>Cargando...</div>
 				) : (
-					<div className="mt-20 ml-20 flex flex-col">
+					<div className="mt-20 ml-20 flex flex-col w-1/3">
 						<div className="text-4xl font-semibold">{resource?.name}</div>
 						<div className="mt-10 flex flex-row">
 							<Info />
@@ -64,7 +64,7 @@ const ResourceDetailsReservation = ({
 						)}
 					</div>
 				)}
-				<div>{children}</div>
+				{children}
 			</div>
 		</div>
 	);
