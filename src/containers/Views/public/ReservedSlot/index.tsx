@@ -3,6 +3,7 @@ import HeaderReservation from '@/components/HeaderReservation';
 import ResourceDetailsReservation from '@/components/ResourceDetailsReservation';
 import { UserDoesntExist } from '@/components/UserDoesntExist';
 import { useResource } from '@/graphql/hooks/myResources/useResource';
+import { addDays } from 'date-fns';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { DateRange } from 'react-day-picker';
@@ -14,8 +15,8 @@ export function ReservedSlotView() {
 	const { resource, isResourceLoading } = useResource({ id: id });
 
 	const defaultDate = {
-		from: resource ? new Date(resource.startDate) : undefined,
-		to: resource ? new Date(resource.endDate) : undefined,
+		from: resource ? new Date(resource.startDate) : new Date(),
+		to: resource ? new Date(resource.endDate) : addDays(new Date(), 15),
 	};
 
 	const title = `${resource?.user.firstName} ${resource?.user.lastName}`;

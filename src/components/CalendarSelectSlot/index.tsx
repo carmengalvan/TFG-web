@@ -17,7 +17,7 @@ const CalendarSelectSlot = ({ date, resourceId }: CalendarSelectSlotProps) => {
 	const { getSlots } = useSlots();
 	const startDate = date.from;
 	const endDate = date.to;
-	const [selectedDays, setSelectedDays] = useState<SelectedDaySlot[]>([]);
+	const [selectedDay, setSelectedDay] = useState<SelectedDaySlot>();
 
 	const getPossibleSlots = async (day: Date): Promise<SelectedDaySlot> => {
 		const formattedDay = format(day, 'yyyy-MM-dd');
@@ -56,7 +56,7 @@ const CalendarSelectSlot = ({ date, resourceId }: CalendarSelectSlotProps) => {
 			isSameDay(day, startDate)
 		) {
 			const newSelectedDay = await getPossibleSlots(day);
-			setSelectedDays([newSelectedDay]);
+			setSelectedDay(newSelectedDay);
 		}
 	};
 	const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
@@ -78,7 +78,7 @@ const CalendarSelectSlot = ({ date, resourceId }: CalendarSelectSlotProps) => {
 							onDayClick={handleDayClick}
 						/>
 					</div>
-					{selectedDays.map((selectedDay) => (
+					{selectedDay && (
 						<div className="ml-16">
 							<div key={selectedDay.day.toISOString()}>
 								<div>
@@ -119,7 +119,7 @@ const CalendarSelectSlot = ({ date, resourceId }: CalendarSelectSlotProps) => {
 								</div>
 							</div>
 						</div>
-					))}
+					)}
 				</div>
 				<Button className="mt-10" type="submit">
 					Guardar
