@@ -31,6 +31,7 @@ export function ReservedSlotView() {
 					>
 						<CalendarSelectSlot
 							date={{ from: defaultDate?.from, to: defaultDate?.to }}
+							resourceId={resource.id}
 						/>
 					</ResourceDetailsReservation>
 				</>
