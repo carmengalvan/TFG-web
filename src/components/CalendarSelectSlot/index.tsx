@@ -57,6 +57,7 @@ const CalendarSelectSlot = ({ date, resourceId }: CalendarSelectSlotProps) => {
 		) {
 			const newSelectedDay = await getPossibleSlots(day);
 			setSelectedDay(newSelectedDay);
+			setSelectedSlot(null);
 		}
 	};
 	const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
